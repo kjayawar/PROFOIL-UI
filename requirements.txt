@@ -1,0 +1,4 @@
+matplotlib==3.4.2
+numpy
+scipy
+pyqt5
