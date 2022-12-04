@@ -1,5 +1,5 @@
 # PROFOIL-UI
-A Python based graphical user interface for the multi-point inverse airfoil design code PROFOIL.
+A Python based graphical user interface for the generalized multi-point inverse airfoil design code [PROFOIL](https://github.com/m-selig/PROFOIL).
 
 ## What is PROFOIL-UI
 
