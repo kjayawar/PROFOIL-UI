@@ -25,9 +25,36 @@ If you have a Python development environment like Anaconda and PyQt5 already ins
 pip install -r requirements.txt
 ```
 
-The necessary folders and files for a PROFOIL install are shown below (graphics files in **./doc_media** are not shown).
+The necessary folders and files for a PROFOIL install are shown below (png files in **./doc_media** and **.in** files in the example folder are indicated by *).
 
-![Directory Structure](./doc_media/3_install-tree.png)
+```
+.
+├── bin
+│   └── profoil.exe
+├── docs
+│   └── PROFOIL-User-Guide-2022.pdf
+├── license
+│   └── license.txt
+├── runs
+│   └── examples
+│       ├── example1.in
+│       ├── example2.in
+│       └── *.in
+├── ui
+│   ├── Manual.html
+│   ├── PROFOIL-UI.bat
+│   ├── README.md
+│   ├── README.txt
+│   ├── doc_media
+│   │   └── *.png
+│   ├── preferences.py
+│   ├── profoil_canvas.py
+│   ├── profoil_interface.py
+│   ├── profoil_ui.py
+│   ├── pyqt_designer.ui
+│   └── requirements.txt
+└── work
+```
 
 
 ## Starting PROFOIL-UI
