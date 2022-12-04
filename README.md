@@ -25,7 +25,7 @@ If you have a Python development environment like Anaconda and PyQt5 already ins
 pip install -r requirements.txt
 ```
 
-The necessary folders and files for a PROFOIL install are shown below (png files in **./doc_media** and **.in** files in the example folder are indicated by *).
+The necessary folders and files for a PROFOIL install are shown below (png files in **./doc_media** and .in files in the **./runs/examples** folder are denoted by *).
 
 ```
 .
