@@ -19,7 +19,7 @@ Users are assumed to have some basic theoretical understanding of the multi-poin
 
 ## Installation
 
-If you have a Python development environment like Anaconda and PyQt5 already installed, it should be sufficient to run PROFOIL-UI straight away. Otherwise a new Python environment can be created, and all the dependencies can be installed via:
+Assuming PROFOIL is already been installed, PROFOIL-UI installation could be completed by downloading the files in to the "ui" folder in the PROFOIL installation. If you have a Python development environment like Anaconda and PyQt5 already installed, it should be sufficient to run PROFOIL-UI straight away. Otherwise a new Python environment can be created, and all the dependencies can be installed via:
 
 ```sh
 pip install -r requirements.txt
