@@ -1,5 +1,6 @@
 # PROFOIL-UI
-A Python based graphical user interface for the generalized multi-point inverse airfoil design code [PROFOIL](https://github.com/m-selig/PROFOIL).
+
+A Python based graphical user interface for the multi-point inverse airfoil design code PROFOIL.
 
 ## What is PROFOIL-UI
 
@@ -19,43 +20,15 @@ Users are assumed to have some basic theoretical understanding of the multi-poin
 
 ## Installation
 
-Assuming PROFOIL is already been installed, PROFOIL-UI installation could be completed by downloading the files in to the "ui" folder in the PROFOIL installation. If you have a Python development environment like Anaconda and PyQt5 already installed, it should be sufficient to run PROFOIL-UI straight away. Otherwise a new Python environment can be created, and all the dependencies can be installed via:
+If you have a Python development environment like Anaconda and PyQt5 already installed, it should be sufficient to run PROFOIL-UI straight away. Otherwise a new Python environment can be created, and all the dependencies can be installed via:
 
 ```sh
 pip install -r requirements.txt
 ```
 
-The necessary folders and files for a PROFOIL install are shown below (png files in **./doc_media** and .in files in the **./runs/examples** folder are denoted by * to indicate multiple files).
+The necessary folders and files for a PROFOIL install are shown below (graphics files in **./doc_media** are not shown).
 
-```
-.
-├── bin
-│   └── profoil.exe
-├── docs
-│   └── PROFOIL-User-Guide-2022.pdf
-├── license
-│   └── license.txt
-├── runs
-│   └── examples
-│       ├── example1.in
-│       ├── example2.in
-│       └── *.in
-├── ui
-│   ├── Manual.html
-│   ├── PROFOIL-UI.bat
-│   ├── README.md
-│   ├── README.txt
-│   ├── doc_media
-│   │   └── *.png
-│   ├── preferences.py
-│   ├── profoil_canvas.py
-│   ├── profoil_interface.py
-│   ├── profoil_ui.py
-│   ├── pyqt_designer.ui
-│   └── requirements.txt
-└── work
-```
-
+![Directory Structure](./doc_media/3_install-tree.png)
 
 ## Starting PROFOIL-UI
 
@@ -65,7 +38,7 @@ Per above, in a typical distribution, PROFOIL-UI is conveniently placed in the *
 python profoil_ui.py
 ```
 
-## Loading an Airfoil   
+## Loading an Airfoil
 
 Upon starting, users can load an airfoil by choosing the input file (a valid PROFOIL .in file) through the <kbd>File</kbd> menu.
 The installation includes the sample files in the **./runs** folder. Choosing one of the samples, e.g. **../runs/examples/example1.in** will load the file into the program to run the executable PROFOIL (**./bin/profoil.exe**).
@@ -130,25 +103,27 @@ This button operates by taking the following actions under the hood.
 
 There will be 4 lines in total in the α\*(ϕ) plot right after a new airfoil is designed (if the program is successfully executed). 
 
-- Black dashed line: 	shows converged data from the previous run.   
-- Blue dashed line: 	shows prescribed α\*(ϕ) curve.   
-- Purple line: 			shows converged data from the most recent run.   
-- Green line: 			shows modifiable α\*(ϕ) distribution using the cursor edits.   
+- Black dashed line:     shows converged data from the previous run.   
+- Blue dashed line:     shows prescribed α\*(ϕ) curve.   
+- Purple line:             shows converged data from the most recent run.   
+- Green line:             shows modifiable α\*(ϕ) distribution using the cursor edits.   
 
 ![phi_alpha_lines](./doc_media/7_phi_alfa_lines.png)
 
 Notes :   
+
 - Black and Blue lines will not be shown in the initial plot because there is no history to show.   
 - Green and purple lines always coincide just after the run. For demonstration purposes, green line was moved away from the purple one in the attached screen-shot.
 
 Once PROFOIL execution finishes, the previous design will be shown in dashed-grey lines and the new design will be shown in solid lines. Typically it is assumed that each successful PROFOIL run will be followed by an analysis session through XFoil or some other means to verify if the intended changes were indeed met. 
 
 Notes :   
+
 - If for some reason, the prescribed α\*(ϕ) distribution does not result in successful design, the plots will not be updated and failure will be indicated through a warning message. 
 - Summary statistics (last 14 lines of profoil.log file) will be displayed in the "Summary" section in the right bottom of the window for successful runs and complete log files could further be inspected in <kbd>File View</kbd> tab. 
 - In case if the program crashes for some unexpected reason, the buffer.in file which is one iteration behind the current profoil.in file can be found in the **./work** directory.  
 
-During this iterative process, geometric overlay could be referenced using the <kbd>Overlay</kbd> menu. In this menu <kbd>\*.dat</kbd> file refers to any file containing 𝓍,𝓎 coordinates with up to 2 header files. This covers profoil.xy files generated by PROFOIL, XFoil format dat files and MSES blade files. The overlay will be kept in the airfoil plot until they will be manually cleared through <kbd>Overlay</kbd> -> <kbd>Clear Overlay</kbd> function.
+During this iterative process, geometric overlay could be referenced using the <kbd>Overlay</kbd> menu. In this menu <kbd>\*.dat</kbd> file refers to a file containing 𝓍,𝓎 coordinates with 0 or 1 header line. This covers profoil.xy files generated by PROFOIL and XFoil format dat files. The overlay will be kept in the airfoil plot until they will be manually cleared through <kbd>Overlay</kbd> -> <kbd>Clear Overlay</kbd> function.
 
 ![phi_alpha_lines](./doc_media/8_overlay.png)
 
@@ -159,6 +134,7 @@ File View tab allows users to make required modifications to profoil.in file wit
 Finally, once the design requirements are met, the most recent profoil.in file in **./work** directory which corresponds to the final design iteration, can be saved into a user specified destination using <kbd>File</kbd> -> <kbd>Save</kbd> function.
 
 ## Special Notes
+
 1. For symmetrical airfoil with **SYM** flag in the _.in_ file, _profoil.dmp_ file will be generated without the lower surface α\*(ϕ) distribution. This leads to the plots in PROFOIL-UI to show only the upper surface α\*(ϕ) markers accordingly. This aligns very well on how PROFOIL treats **SYM** flag as it reads only the upper surface α\*(ϕ) distribution and discards the FOIL lines past ILE. In practice, if one wants the graphs to show the lower surface α\*(ϕ) markers as well, then **SYM_TOGGLE** flag should be used just before the **DUMP** line in the _profoil.in_ file. 
 
 Below images show the program output, without SYM_TOGGLE option and with SYM_TOGGLE option for better clarity.
@@ -193,4 +169,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
