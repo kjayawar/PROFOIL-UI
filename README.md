@@ -3,7 +3,7 @@ A Python based graphical user interface for the multi-point inverse airfoil desi
 
 ## What is PROFOIL-UI
 
-PROFOIL-UI is a minimalistic GUI front-end for PROFOIL.  In PROFOIL, an airfoil is chiefly defined by its α\*(ϕ) distribution.  The new PROFOIL-UI can be used to edit an α\*(ϕ) distribution and thereby define a new airfoil through iteration.  Mouse cursor edits to the α\*(ϕ) distribution are made through the UI.  The UI can be used to display both the current and prior airfoil to better examine how the airfoil evolves iteratively through the design process.
+PROFOIL-UI is a minimalistic GUI front-end for [PROFOIL](https://github.com/m-selig/PROFOIL).  In PROFOIL, an airfoil is chiefly defined by its α\*(ϕ) distribution.  The new PROFOIL-UI can be used to edit an α\*(ϕ) distribution and thereby define a new airfoil through iteration.  Mouse cursor edits to the α\*(ϕ) distribution are made through the UI.  The UI can be used to display both the current and prior airfoil to better examine how the airfoil evolves iteratively through the design process.
 
 The diagrams below illustrate the typical PROFOIL work-flow along with the PROFOIL-UI work-flow to show how the two programs fit together.
 
