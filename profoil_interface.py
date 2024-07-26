@@ -271,10 +271,17 @@ def save2profoil_in(text, filename=WORKDIR/"profoil.in"):
     """
     saves changes to the profoil.in file if the contents were actually altered.
     """
-    if catfile(WORKDIR/"profoil.in") == text: return
-    with Path(filename).open("w") as f:
-        f.write(text)       
 
+    # bug fix -- 26/Jul/2024
+    # https://www.rcgroups.com/forums/showpost.php?p=52737531&postcount=95
+    # could have used 'a+' flag for edge case of non-existing file with one open call 
+    # but seek(0) would make it vulnerable in some unix based systems.
+
+    f_handle = Path(filename)
+    if (f_handle.is_file() and f_handle.open('r').read() == text): return
+    with f_handle.open("w") as f:
+        print("writing")
+        f.write(text)   
 
 def is_design_converged(filename="profoil.log"):
     """
