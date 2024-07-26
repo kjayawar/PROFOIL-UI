@@ -189,11 +189,14 @@ class ProfoilCanvas:
         """
         clears all axes data such that new session with new airfoil can be loaded.
         """
-        self.ue_ax.lines=[]
-        self.ue_ax.collections=[]
+        # bug fix -- 26/Jul/2024
+        # https://www.rcgroups.com/forums/showpost.php?p=52749409&postcount=110
 
-        self.xy_ax.lines=[]
-        self.xy_ax.collections=[]
+        for l in self.ue_ax.lines: l.remove()
+        for c in self.ue_ax.collections: c.remove()
+
+        for l in self.xy_ax.lines: l.remove()
+        for c in self.xy_ax.collections: c.remove()
 
         self.clear_an_ax()
 
