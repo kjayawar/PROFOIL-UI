@@ -280,7 +280,6 @@ def save2profoil_in(text, filename=WORKDIR/"profoil.in"):
     f_handle = Path(filename)
     if (f_handle.is_file() and f_handle.open('r').read() == text): return
     with f_handle.open("w") as f:
-        print("writing")
         f.write(text)   
 
 def is_design_converged(filename="profoil.log"):
