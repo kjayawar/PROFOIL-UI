@@ -133,7 +133,7 @@ def gen_vel_splines(phi_list, vel_list):
     phi-v/v_inf distribution. These splines will be used to locate the 
     phi markers on the upper and lower surfaces.
     """
-    return [interp1d(phi,v) for phi,v in zip(phi_list, vel_list)]
+    return [interp1d(phi,v, fill_value='extrapolate') for phi,v in zip(phi_list, vel_list)]
 
 def gen_phi2xy_splines(x, y):
     """
@@ -143,7 +143,7 @@ def gen_phi2xy_splines(x, y):
     x,y coordinates are taken from profoil.xy file and equidistant phi distribution is presumed.
     """
     phis = np.linspace(0,360, len(x))
-    return interp1d(phis,x), interp1d(phis,y)
+    return interp1d(phis,x, fill_value='extrapolate'), interp1d(phis,y, fill_value='extrapolate')
 
 def extract_all_data():
     """
