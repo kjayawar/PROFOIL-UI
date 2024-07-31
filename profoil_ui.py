@@ -39,11 +39,11 @@ Upon multiple failed attempts to fix this issue in a pragmatic way, below decora
 to wrap the home button with an additional axis limit change. 
 """
 
-# home = NavigationToolbar.home
-# def patched_home(self, *args, **kwargs):
-#     home(self, *args, **kwargs)
-#     ui.setup_axes_limits()
-# NavigationToolbar.home = patched_home
+home = NavigationToolbar.home
+def patched_home(self, *args, **kwargs):
+    home(self, *args, **kwargs)
+    ui.setup_axes_limits()
+NavigationToolbar.home = patched_home
 
 
 class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
