@@ -165,7 +165,7 @@ class ProfoilCanvas:
         self.an_ax.grid(True)
 
         self.xy_ax.axes.set_aspect('equal', 'datalim')
-        # self.an_ax.axes.set_aspect('equal', 'datalim')
+        # self.ue_ax.axes.set_aspect(0.5, 'datalim')
 
         self.setup_axes_limits()
 
@@ -174,7 +174,7 @@ class ProfoilCanvas:
         initializes the axes limits
         """
         self.ue_ax.set_xlim(-0.08, 1.08)
-        self.ue_ax.set_ylim(0, 2.5)
+        self.ue_ax.set_ylim(0, 2.32)
 
         self.xy_ax.set_xlim(-0.08, 1.08)
 
@@ -189,6 +189,7 @@ class ProfoilCanvas:
         """
         clears all axes data such that new session with new airfoil can be loaded.
         """
+        
         # bug fix -- 26/Jul/2024
         # https://www.rcgroups.com/forums/showpost.php?p=52749409&postcount=110
 
@@ -650,7 +651,7 @@ class ProfoilCanvas:
         """
         updates the summary label in the design view
         """
-        self.lbl_summary.setText(p_intf.catfile(BINDIR/"profoil.log", tail=14))
+        self.lbl_summary.setText(p_intf.extract_summary(BINDIR/"profoil.log"))
 
     def extract_all_profoil_data(self):
         """
