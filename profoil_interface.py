@@ -58,12 +58,6 @@ import shutil
 WORKDIR = Path(WORK_DIR).resolve()   # using absolute paths
 BINDIR  = Path(BIN_DIR).resolve()    # using absolute paths
 
-# changing the working directory in to BINDIR
-# so that its not necessary to switch back and forth between
-# WORKDIR and BINDIR on each profoil run
-
-os.chdir(BINDIR)
-
 def extract_alphas(filename="profoil.in"):
     """
     Extracts design alpha values from the profoil.in file
@@ -298,7 +292,14 @@ def exec_profoil():
     Executes PROFOIL.exe located in the BINDIR
     chdir found to be required to do this without using subprocess.
     """
-    os.system("{} > profoil.log".format("profoil.exe" if os.name == "nt" else "./profoil"))
+    try:
+        os.system("{} > profoil.log".format("profoil.exe" if os.name == "nt" else "./profoil"))
+    except:
+        # changing the working directory in to BINDIR
+        # so that its not necessary to switch back and forth between
+        # WORKDIR and BINDIR on each profoil run
+        os.chdir(BINDIR)
+        exec_profoil()
 
 def extract_summary(filename="profoil.log"):
     """

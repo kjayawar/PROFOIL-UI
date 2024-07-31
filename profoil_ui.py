@@ -175,7 +175,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     # Set the icon
-    app.setWindowIcon(QtGui.QIcon("../ui/profoil_ui.ico"))
+    app.setWindowIcon(QtGui.QIcon("profoil_ui.ico"))
     
     MainWindow = QtWidgets.QMainWindow()
     ui = ProfoilUI()
