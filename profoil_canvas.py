@@ -165,7 +165,7 @@ class ProfoilCanvas:
         self.an_ax.grid(True)
 
         self.xy_ax.axes.set_aspect('equal', 'datalim')
-        # self.ue_ax.axes.set_aspect(0.5, 'datalim')
+        self.ue_ax.axes.set_aspect(0.5, 'datalim')
 
         self.setup_axes_limits()
 
