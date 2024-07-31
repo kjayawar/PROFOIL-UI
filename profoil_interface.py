@@ -300,6 +300,16 @@ def exec_profoil():
     """
     os.system("{} > profoil.log".format("profoil.exe" if os.name == "nt" else "./profoil"))
 
+def extract_summary(filename="profoil.log"):
+    """
+    Extracts the summary portion from the log file. 
+    If airfoil name is prescribed in the *.in file the name will be extracted too
+    """
+    text = open(filename).read()
+    stats = re.findall('\*{5}STATISTICS\*{5}\n(.*)|$', text, flags=re.DOTALL)[0]
+    airfoil_name = re.findall("Airfoil Name:(.*)|$", text)[0].strip()
+    return f"{airfoil_name}\n\n{stats}"
+
 """
 Below utility functions are self explanatory. 
 They just move the files from BIN directory to WORK directory and vise versa.
