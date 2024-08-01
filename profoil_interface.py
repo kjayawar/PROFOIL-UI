@@ -57,6 +57,7 @@ import shutil
 
 WORKDIR = Path(WORK_DIR).resolve()   # using absolute paths
 BINDIR  = Path(BIN_DIR).resolve()    # using absolute paths
+EXEC_ABS_PATH = str(BINDIR/"{}".format("profoil.exe" if os.name == "nt" else "./profoil"))
 
 def extract_alphas(filename="profoil.in"):
     """
@@ -285,21 +286,15 @@ def is_design_converged(filename="profoil.log"):
     Because there could be errors in calculations in VELDIST for ex:
     even after the design is converged
     """
-    return "AIRFOIL DESIGN IS FINISHED" in Path(BINDIR/filename).open().read()
+    return "AIRFOIL DESIGN IS FINISHED" in Path(WORKDIR/filename).open().read()
 
 def exec_profoil():
     """
     Executes PROFOIL.exe located in the BINDIR
     chdir found to be required to do this without using subprocess.
     """
-    try:
-        os.system("{} > profoil.log".format("profoil.exe" if os.name == "nt" else "./profoil"))
-    except:
-        # changing the working directory in to BINDIR
-        # so that its not necessary to switch back and forth between
-        # WORKDIR and BINDIR on each profoil run
-        os.chdir(BINDIR)
-        exec_profoil()
+    os.chdir(WORKDIR)
+    os.system("{} > profoil.log".format(EXEC_ABS_PATH))
 
 def extract_summary(filename="profoil.log"):
     """
@@ -316,9 +311,6 @@ Below utility functions are self explanatory.
 They just move the files from BIN directory to WORK directory and vise versa.
 shutil is used to keep the generality between platforms.
 """
-def work2bin():
-    shutil.copy(WORKDIR/"profoil.in", BINDIR/"profoil.in")
-
 def gen_buffer():
     shutil.copy(WORKDIR/"profoil.in", WORKDIR/"buffer.in")
 
@@ -326,12 +318,6 @@ def swap_buffer():
     shutil.copy(WORKDIR/"profoil.in", WORKDIR/"temp.in")
     shutil.copy(WORKDIR/"buffer.in",  WORKDIR/"profoil.in")
     shutil.copy(WORKDIR/"temp.in",    WORKDIR/"buffer.in")
-
-def bin2work():
-    shutil.copy(BINDIR/"profoil.xy" , WORKDIR/"profoil.xy" )
-    shutil.copy(BINDIR/"profoil.vel", WORKDIR/"profoil.vel")
-    shutil.copy(BINDIR/"profoil.dmp", WORKDIR/"profoil.dmp")
-    shutil.copy(BINDIR/"profoil.log", WORKDIR/"profoil.log")
 
 def catfile(filename, tail=0):
     """

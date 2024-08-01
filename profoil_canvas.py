@@ -644,18 +644,18 @@ class ProfoilCanvas:
         """
         Updates the text boxes in the File View tab
         """
-        self.plainTextEdit_profoil_log.setPlainText(p_intf.catfile(BINDIR/"profoil.log", tail=0))
-        self.plainTextEdit_profoil_in.setPlainText(p_intf.catfile(BINDIR/"profoil.in", tail=0))
+        self.plainTextEdit_profoil_log.setPlainText(p_intf.catfile(WORKDIR/"profoil.log", tail=0))
+        self.plainTextEdit_profoil_in.setPlainText(p_intf.catfile(WORKDIR/"profoil.in", tail=0))
 
     def update_summary_text(self):
         """
         updates the summary label in the design view
         """
-        self.lbl_summary.setText(p_intf.extract_summary(BINDIR/"profoil.log"))
+        self.lbl_summary.setText(p_intf.extract_summary(WORKDIR/"profoil.log"))
 
     def extract_all_profoil_data(self):
         """
-        Once the PROFOIL is finished running, the data will be in the BINDIR.
+        Once the PROFOIL is finished running, the data will be in the WORKDIR.
         This functions updates all the relevant fields in the UI
         from the PROFOIL output files in one go
         """
@@ -683,18 +683,15 @@ class ProfoilCanvas:
         # last step is for conceptual isolation between bin and work
         # because the airfoil designer is supposed to work on work_directory
 
-        p_intf.work2bin()
         p_intf.exec_profoil()
-        p_intf.bin2work()
 
         # profoil run may or may not have been successful.
         # either way, file view has to be updated.
-        # conditional logic follows
+        # conditional logic follows for the graphics
 
         self.update_file_view()
         
         if p_intf.is_design_converged():
-            p_intf.bin2work()
             self.extract_all_profoil_data()
             self.update_summary_text()
             self.plot_ue()
