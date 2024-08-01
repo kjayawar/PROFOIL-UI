@@ -96,6 +96,7 @@ class ProfoilCanvas:
         self.lower_xlim =AN_PLOT_XLIMITS_LOWER
         self.lower_ylim =tuple(reversed(AN_PLOT_YLIMITS)) if AN_FLIP_YAXIS_LOWER_SURFACE else AN_PLOT_YLIMITS
 
+        # Creating the matplotlib figure containing all 3 plots.
         self.gen_gui_fig()
         
         # Upper Surface Lines in the phi-alpha* distribution plot
@@ -114,7 +115,16 @@ class ProfoilCanvas:
         self.lower_nu_alfa_prescribed = plt.Line2D([],[], linestyle=AN_PRES_LINE_LINESTYLE, marker=AN_PRES_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_PRES_LINE_COLOR, markerfacecolor=AN_PRES_LINE_MARKERFACECOLOR, clip_on=False)
         self.lower_nu_alfa_modi       = plt.Line2D([],[], linestyle=AN_MODI_LINE_LINESTYLE, marker=AN_MODI_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_MODI_LINE_COLOR, clip_on=False)
 
+        # cursor edit line
         self.cursor_edit_line, = self.an_ax.plot([], [], AN_SPLN_LINE_LINESTYLE, picker=True, color=AN_SPLN_LINE_COLOR, linewidth=AN_PLOT_LINEWIDTH)
+
+        # DAT Overlay line. Matplotlib versions >3.5 has ArtistList class in-place of generic list
+        # which does not support alterations matplotlib previously supported. so a Line2D object is added to the xy_ax
+        # axis which will be updated when a DAT file is loaded. Initially this line is set to be not visible.
+
+        self.overlay_line = plt.Line2D([],[], linestyle=OVERLAY_LINESTYLE, marker=OVERLAY_LINE_MARKER, linewidth=OVERLAY_LINEWIDTH, markersize=OVERLAY_MARKERSIZE, color=OVERLAY_LINE_COLOR, markerfacecolor=OVERLAY_MARKERFACECOLOR, clip_on=False)
+        self.overlay_line.set_visible(False)
+        self.xy_ax.add_line(self.overlay_line)
 
         # Flags
         # =====
@@ -151,8 +161,8 @@ class ProfoilCanvas:
         initializes the axes
         """
         self.ue_ax.n_untouch = 0
-        self.xy_ax.n_untouch = 0
-        self.an_ax.n_untouch = 1 # spline will be untouched
+        self.xy_ax.n_untouch = 1 # DAT overlay line has to be untouchable to not to get overwritten in each run.
+        self.an_ax.n_untouch = 1 # cursor edit spline has to be untouchable
 
         self.ue_ax.set_title(r'$Velocity\ Distribution$')
         self.ue_ax.set_ylabel(r'$V/V_{\infty}$')
@@ -193,13 +203,9 @@ class ProfoilCanvas:
         # bug fix -- 26/Jul/2024
         # https://www.rcgroups.com/forums/showpost.php?p=52749409&postcount=110
 
-        for l in self.ue_ax.lines: l.remove()
-        for c in self.ue_ax.collections: c.remove()
-
-        for l in self.xy_ax.lines: l.remove()
-        for c in self.xy_ax.collections: c.remove()
-
-        self.clear_an_ax()
+        self.clear_ax(self.ue_ax)
+        self.clear_ax(self.xy_ax)
+        self.clear_ax(self.an_ax)
 
         self.upper_nu_alfa_previous.set_data([],[]) 
         self.upper_nu_alfa_current.set_data([],[]) 
@@ -275,7 +281,7 @@ class ProfoilCanvas:
             y-axis is inverted upon switching.
         """
         self.reset_toolbar()
-        self.clear_an_ax()
+        self.clear_ax(self.an_ax)
         if surface =="Upper":
             # backup zoomed limits if applicable.
             if not first_time:
@@ -520,29 +526,6 @@ class ProfoilCanvas:
 
         ax.set_prop_cycle(None)
 
-    def proc_make_line_untouchable(self, ax, plot_index=-1):
-        """
-        plot list is divided into 2 main sections.
-        untouchable plots ; these hold fixed REF lines
-        touchable plots   ; these hold variable plots.
-        untouchable plots were pushed towards the beginning of the
-        plot list such that the remaining plots can be modified with
-        slicing with ease
-        """
-        plots = ax.lines
-        reserve_plot = plots[plot_index]
-        del plots[plot_index]
-        plots.insert(ax.n_untouch, reserve_plot)
-        ax.n_untouch += 1
-
-    def remove_last_untouchable(self, ax):
-        """
-        Pops the last object from the "untouchable plots" section of ax.lines list
-        """
-        plots = ax.lines
-        del plots[ax.n_untouch -1]
-        ax.n_untouch -= 1
-
     def plot_xy(self, n_prev_plots =1):
         """ 
         Plots airfoil contour
@@ -592,14 +575,18 @@ class ProfoilCanvas:
         self.upper_nu_alfa_previous.set_data(*self.upper_nu_alfa_current.get_data())
         self.lower_nu_alfa_previous.set_data(*self.lower_nu_alfa_current.get_data())
 
-    def clear_an_ax(self):
+    def clear_ax(self, ax):
         """
         Removes all lines except the "untouchable plots" section
         ax.clear(...) wouldn't work here because it resets all the limits and
         de-reference the axes from the cursor editor.
+        n_untouch is not applicable for collections because the only 2 lines that are untouchable
+        are the cursor edit line and overlay line- none of them have associated collection
         """
-        for line in self.an_ax.lines[self.an_ax.n_untouch:]: 
+        for line in ax.lines[ax.n_untouch:]: 
             line.remove()
+        for c in ax.collections: 
+            c.remove()
 
     def plot_nu_alfa(self):
         """
@@ -618,7 +605,7 @@ class ProfoilCanvas:
 
     def overlay_dat(self, datfile, skiprows):
         """
-        This function overlays a given dat file contour in the xy plot.
+        This function overlays a given DAT file contour in the xy plot.
         File formats with different number of header are supported
         """
         try:
@@ -627,8 +614,8 @@ class ProfoilCanvas:
             self.overlay_error_dialog()
             return
 
-        self.xy_ax.plot(x, y, OVERLAY_LINESTYLE, lw=OVERLAY_LINEWIDTH, color=OVERLAY_LINECOLOR, markersize=OVERLAY_MARKERSIZE, clip_on=False)
-        self.proc_make_line_untouchable(self.xy_ax)
+        self.overlay_line.set_data(x,y)
+        self.overlay_line.set_visible(True)
         self.gui_fig.canvas.draw()
 
     def clear_overlay(self):
@@ -637,7 +624,8 @@ class ProfoilCanvas:
         If more than one overlay being added the last one
         will be cleared off first
         """
-        self.remove_last_untouchable(self.xy_ax)
+        self.overlay_line.set_data([],[])
+        self.overlay_line.set_visible(False)
         self.gui_fig.canvas.draw()
 
     def update_file_view(self):

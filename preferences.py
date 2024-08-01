@@ -78,9 +78,11 @@ XY_PLOT_LINEWIDTH               = 1                 # XY Plot line width
 XY_PLOT_COLOR                   = "black"           # XY Plot line color
 
 OVERLAY_LINEWIDTH               = 1                 # Overlay Plot line width                   
-OVERLAY_LINESTYLE               = '.--'             # Overlay Plot line style
-OVERLAY_LINECOLOR               = 'red'             # Overlay Plot line color
-OVERLAY_MARKERSIZE              = 5                 # Overlay Plot line marker
+OVERLAY_LINESTYLE               = '--'              # Overlay Plot line style
+OVERLAY_LINE_MARKER             = "."               # Overlay Plot line marker
+OVERLAY_LINE_COLOR              = 'red'             # Overlay Plot line color
+OVERLAY_MARKERSIZE              = 5                 # Overlay Plot marker size
+OVERLAY_MARKERFACECOLOR         = 'red'             # Overlay Plot marker color
 
 #================================= CONFIG RELATED TO UE & XY PLOTS ==================================
 
