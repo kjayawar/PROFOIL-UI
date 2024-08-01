@@ -74,7 +74,7 @@ from scipy.interpolate import interp1d
 
 from preferences import *
 import profoil_interface as p_intf
-from profoil_interface import WORKDIR, BINDIR
+from profoil_interface import WORKDIR
 
 import matplotlib
 matplotlib.use('Qt5Agg', force=True)
@@ -677,12 +677,7 @@ class ProfoilCanvas:
         Executes PROFOIL when the profoil.in file is ready in the WORKDIR
         """
 
-        # copy profoil.in file from work_directory in to bin directory
         # execute profoil
-        # bring all the output files back in to work_directory
-        # last step is for conceptual isolation between bin and work
-        # because the airfoil designer is supposed to work on work_directory
-
         p_intf.exec_profoil()
 
         # profoil run may or may not have been successful.
