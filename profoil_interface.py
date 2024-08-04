@@ -59,7 +59,7 @@ WORKDIR = Path(WORK_DIR).resolve()   # using absolute paths
 BINDIR  = Path(BIN_DIR).resolve()    # using absolute paths
 EXEC_ABS_PATH = str(BINDIR/"{}".format("profoil.exe" if os.name == "nt" else "./profoil"))
 
-def extract_alphas(filename="profoil.in"):
+def extract_alphas(filename=WORKDIR/"profoil.in"):
     """
     Extracts design alpha values from the profoil.in file
     This functions is not currently being used but could
@@ -67,7 +67,7 @@ def extract_alphas(filename="profoil.in"):
     in the velocity plot
     """
     alphas = []
-    lines = Path(WORKDIR/filename).open().readlines()
+    lines = open(filename).readlines()
     for i, line in enumerate(lines):
         if line.startswith("ALFASP "):
             n = int(re.findall("ALFASP\s+(\d+)", line)[0])
@@ -76,30 +76,30 @@ def extract_alphas(filename="profoil.in"):
     assert len(alphas) == n
     return alphas
 
-def extract_xy(filename="profoil.xy"):
+def extract_xy(filename=WORKDIR/"profoil.xy"):
     """
     Extracts  x,y data from profoil.xy file
     """
-    x,y = np.loadtxt(Path(WORKDIR/filename)).T
+    x,y = np.loadtxt(filename).T
     return x,y
 
-def extract_vel(filename="profoil.vel"):
+def extract_vel(filename=WORKDIR/"profoil.vel"):
     """
     Extracts v/v_inf data from profoil.vel file
     First column is expected to carry "phi" data
     generated with VELDIST 60
     """
-    phi, v_vinf= np.loadtxt(Path(WORKDIR/filename)).T
+    phi, v_vinf= np.loadtxt(filename).T
     return phi, v_vinf
 
-def extract_dmp(filename="profoil.dmp"):
+def extract_dmp(filename=WORKDIR/"profoil.dmp"):
     """
     Extracts the converged nu-alpha* pairs, LE index,
     and recovery parameters from the profoil.dump file.
     regex is used exclusively for all extractions
     with multi-line flag.
     """
-    text = Path(WORKDIR/filename).open().read()
+    text = open(filename).read()
     foil_section = re.findall(r"^FOIL.*(?:\nFOIL.*)*$", text, flags = re.M)[0]
     nu, alfa = np.loadtxt(StringIO(foil_section), usecols=(1,2)).T
     ile = int(re.findall(r"^ILE\s+(\d+)", text, flags=re.M)[0])
@@ -230,14 +230,14 @@ def extract_all_data():
             ue_lines, upper_vel_markers, lower_vel_markers, \
             nu_upper, alfa_upper, nu_lower, alfa_lower, ile
 
-def gen_input_template(filename="profoil.in"):
+def gen_input_template(filename=WORKDIR/"profoil.in"):
     """
     Takes profoil.in file and devoid the FOIL section containing
     nu-alpha* block along with ILE line so that these 2 sections
     can then be filled up by profoil-ui data
     As a precautionary measure, VELDIST will be set to 60 as well.
     """
-    file_content            = Path(WORKDIR/filename).open().read()
+    file_content            = open(filename).read()
     foils_blk_devoided      = re.sub(r"^FOIL.*(?:\nFOIL.*)*$", r"{}",   file_content,       flags=re.M)
     foils_ile_devoided      = re.sub(r"(^ILE\s+)\d+",          r"\1{}", foils_blk_devoided, flags=re.M)
     foils_ile_vdist_fixed   = re.sub(r"^VELDIST\s+\d+",  r"VELDIST 60", foils_ile_devoided, flags=re.M)
@@ -277,7 +277,7 @@ def save2profoil_in(text, filename=WORKDIR/"profoil.in"):
     with f_handle.open("w") as f:
         f.write(text)   
 
-def is_design_converged(filename="profoil.log"):
+def is_design_converged(filename=WORKDIR/"profoil.log"):
     """
     Upon running PROFOIL.exe this function examines profoil.log file 
     for successful completion of airfoil design.
@@ -286,7 +286,7 @@ def is_design_converged(filename="profoil.log"):
     Because there could be errors in calculations in VELDIST for ex:
     even after the design is converged
     """
-    return "AIRFOIL DESIGN IS FINISHED" in Path(WORKDIR/filename).open().read()
+    return "AIRFOIL DESIGN IS FINISHED" in open(filename).read()
 
 def exec_profoil():
     """
@@ -296,7 +296,7 @@ def exec_profoil():
     os.chdir(WORKDIR)
     os.system("{} > profoil.log".format(EXEC_ABS_PATH))
 
-def extract_summary(filename="profoil.log"):
+def extract_summary(filename=WORKDIR/"profoil.log"):
     """
     Extracts the summary portion from the log file. 
     If airfoil name is prescribed in the *.in file the name will be extracted too
@@ -304,7 +304,10 @@ def extract_summary(filename="profoil.log"):
     text = open(filename).read()
     stats = re.findall('\*{5}STATISTICS\*{5}\n(.*)|$', text, flags=re.DOTALL)[0]
     airfoil_name = re.findall("Airfoil Name:(.*)|$", text)[0].strip()
-    return f"{airfoil_name}\n\n{stats}"
+    
+    # Strip spaces from each line of stats
+    stripped_stats = "\n".join(line.strip() for line in stats.splitlines())
+    return f"{airfoil_name}\n\n{stripped_stats}"
 
 """
 Below utility functions are self explanatory. 
