@@ -635,6 +635,9 @@ class ProfoilCanvas:
         self.plainTextEdit_profoil_log.setPlainText(p_intf.catfile(WORKDIR/"profoil.log", tail=0))
         self.plainTextEdit_profoil_in.setPlainText(p_intf.catfile(WORKDIR/"profoil.in", tail=0))
 
+        # upon updating  plainTextEdit_profoil_in change the save button color back to black
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
+
     def update_summary_text(self):
         """
         updates the summary label in the design view

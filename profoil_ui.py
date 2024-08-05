@@ -102,6 +102,16 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
         self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
 
+        # Connect textChanged signal to slot
+        self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
+
+    def on_profoil_in_text_changed(self):
+        """
+        Indicates there are some unsaved changes in the profoil.in file
+        by changing the color of the "Save" button
+        """
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red;}')
+
     def switch_surface(self, event):
         """
         Switching the surface through the combo box.
@@ -136,6 +146,9 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         """
         p_intf.gen_buffer()
         p_intf.save2profoil_in(self.plainTextEdit_profoil_in.toPlainText())
+
+        # upon saving change the save button color back to black
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
 
     def menu_file_open(self):
         """
