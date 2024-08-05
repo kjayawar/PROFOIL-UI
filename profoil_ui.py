@@ -31,6 +31,19 @@ from profoil_canvas import ProfoilCanvas
 from preferences import *
 import profoil_interface as p_intf
 
+"""
+Below is a monkey patch to handle a possible bug in matplotlib. 
+regardless of the back-end, matplotlib tool-bar home-button, doesn't appear to redraw even when the frameon=True. 
+This results in messed up axis limits on zoom-> home.
+Upon multiple failed attempts to fix this issue in a pragmatic way, below decorator is introduced
+to wrap the home button with an additional axis limit change. 
+"""
+
+home = NavigationToolbar.home
+def patched_home(self, *args, **kwargs):
+    home(self, *args, **kwargs)
+    ui.setup_axes_limits()
+NavigationToolbar.home = patched_home
 
 class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
     def __init__(self):

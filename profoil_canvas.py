@@ -139,7 +139,7 @@ class ProfoilCanvas:
 
         # Setting up the main window/figure
 
-        self.gui_fig = Figure(figsize=(12, 7))
+        self.gui_fig = Figure()
         grid = plt.GridSpec(4,2, wspace=0.1, hspace=0.2)
 
         # Setting up the 3 main axes
@@ -174,9 +174,6 @@ class ProfoilCanvas:
         self.an_ax.set_xlabel(r"$\phi$")
         self.an_ax.grid(True)
 
-        self.xy_ax.axes.set_aspect('equal', 'datalim')
-        # self.ue_ax.axes.set_aspect(0.5, 'datalim')
-
         self.setup_axes_limits()
 
     def setup_axes_limits(self):
@@ -194,6 +191,13 @@ class ProfoilCanvas:
         if self.active_surface == "Upper":
             self.an_ax.set_xlim(*AN_PLOT_XLIMITS_UPPER)
             self.an_ax.set_ylim(*AN_PLOT_YLIMITS)
+
+        # Setting the aspect ratios.
+        # For alpha*-nu axis and x-y axis aspect ratio should be 1
+        # For velocity aspect ratio of 0.5, ie: 2 units of y -> 1 unit of x being used
+        self.xy_ax.axes.set_aspect('equal', 'datalim')
+        self.an_ax.axes.set_aspect('equal', 'datalim')
+        self.ue_ax.axes.set_aspect(0.5, 'datalim')
 
     def clear_axes(self):
         """
