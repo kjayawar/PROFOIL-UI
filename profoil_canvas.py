@@ -81,6 +81,8 @@ matplotlib.use('Qt5Agg', force=True)
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+from PyQt5 import QtCore
+
 class ProfoilCanvas:
 
     def __init__(self):
@@ -174,30 +176,48 @@ class ProfoilCanvas:
         self.an_ax.set_xlabel(r"$\phi$")
         self.an_ax.grid(True)
 
-        self.setup_axes_limits()
-
-    def setup_axes_limits(self):
-        """
-        initializes the axes limits
-        """
-        self.ue_ax.set_xlim(-0.08, 1.08)
-        self.ue_ax.set_ylim(0, 2.32)
-
-        self.xy_ax.set_xlim(-0.08, 1.08)
-
-        if self.active_surface == "Lower":
-            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_LOWER)
-            self.an_ax.set_ylim(*(tuple(reversed(AN_PLOT_YLIMITS)) if AN_FLIP_YAXIS_LOWER_SURFACE else AN_PLOT_YLIMITS))
-        if self.active_surface == "Upper":
-            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_UPPER)
-            self.an_ax.set_ylim(*AN_PLOT_YLIMITS)
-
         # Setting the aspect ratios.
         # For alpha*-nu axis and x-y axis aspect ratio should be 1
         # For velocity aspect ratio of 0.5, ie: 2 units of y -> 1 unit of x being used
         self.xy_ax.axes.set_aspect('equal', 'datalim')
         self.an_ax.axes.set_aspect('equal', 'datalim')
         self.ue_ax.axes.set_aspect(0.5, 'datalim')
+
+        self.setup_axes_limits()
+
+    def update_ylim(self, ax, y_lower):
+        """
+        Given a bounded x-range set y-range of an axis keeping the AR or bbox size intact
+        https://github.com/matplotlib/matplotlib/issues/28673
+        """
+        bbox = ax.get_window_extent().transformed(ax.get_figure().dpi_scale_trans.inverted())
+        pixel_AR = bbox.height/bbox.width
+        x_lim = ax.get_xlim()
+        x_range = abs(x_lim[0]-x_lim[1])
+        y_range = (x_range/ax.get_aspect()) * pixel_AR
+        ax.set_ylim(y_lower, y_lower+y_range)
+
+    def setup_axes_limits(self):
+        """
+        initializes the axes limits
+        """
+        self.ue_ax.set_xlim(-0.08, 1.08)
+        self.update_ylim(self.ue_ax, y_lower=0)
+        # self.ue_ax.set_ylim(0, 2.32)
+
+        self.xy_ax.set_xlim(-0.08, 1.08)
+        self.update_ylim(self.xy_ax, y_lower=-0.15)
+
+        if self.active_surface == "Lower":
+            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_LOWER)
+            self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
+            if AN_FLIP_YAXIS_LOWER_SURFACE : 
+                self.an_ax.invert_yaxis()
+            # self.an_ax.set_ylim(*(tuple(reversed(AN_PLOT_YLIMITS)) if AN_FLIP_YAXIS_LOWER_SURFACE else AN_PLOT_YLIMITS))
+        if self.active_surface == "Upper":
+            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_UPPER)
+            self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
+            # self.an_ax.set_ylim(*AN_PLOT_YLIMITS)
 
     def clear_axes(self):
         """
@@ -247,22 +267,26 @@ class ProfoilCanvas:
             
     def on_click(self, event):
         """
-        All the mouse click events goes here
+        All the mouse click events go here
         """
         if not self.ready_to_interact: return
         if not self.edit_mode: return
         if event.inaxes!=self.an_ax: return
 
-        # Left click
+        # Left click : Add a point to the edit line
         if event.button == 1:
             self.cursor_edit_line_points.append([event.xdata,event.ydata])
             self.cursor_edit_line_points.sort()
             self.cursor_edit_line.set_data(*list(zip(*self.cursor_edit_line_points)))
+            # Ensure cursor remains a cross-hair during the edit process
+            self.canvas.setCursor(QtCore.Qt.CrossCursor)
             self.gui_fig.canvas.draw()
 
         # Right Click and spline is actually built
         if event.button == 3:
             self.apply_edits(event)
+            # Reset to default cursor after applying edits
+            self.setCursor(QtCore.Qt.ArrowCursor)
             self.gui_fig.canvas.draw()
 
     def backup_zoomed_limits(self, surface):
@@ -378,7 +402,11 @@ class ProfoilCanvas:
         self.reset_toolbar()
         self.edit_mode = not self.edit_mode
         self.btn_start_edits.setStyleSheet('QPushButton {color: red;}' if self.edit_mode else 'QPushButton {color: black;}')
-        if not self.edit_mode: self.cancel_cursor_inputs()
+        if self.edit_mode:
+            self.canvas.setCursor(QtCore.Qt.CrossCursor)  # Keep cross-hair during edit mode
+        else:
+            self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor when exiting edit mode
+            self.cancel_cursor_inputs()
 
     def cancel_cursor_inputs(self, event=None):
         """
@@ -390,6 +418,7 @@ class ProfoilCanvas:
         self.cursor_edit_line.set_data([],[])
         self.cursor_edit_line_points = self.cursor_edit_line.get_xydata().tolist()
         self.set_edit_mode_off()
+        self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor on the canvas
         self.gui_fig.canvas.draw()
 
     def apply_edits(self, event):
@@ -441,7 +470,7 @@ class ProfoilCanvas:
         This action confirms any manual modifications if applicable
         """
         self.reset_toolbar()
-        nu, alfa, ile, phis = p_intf.extract_dmp("profoil.in")
+        nu, alfa, ile, phis = p_intf.extract_dmp(WORKDIR/"profoil.in")
 
         nu_upper = nu[:ile]
         alfa_upper = alfa[:ile]

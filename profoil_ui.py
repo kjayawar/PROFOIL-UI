@@ -31,6 +31,8 @@ from profoil_canvas import ProfoilCanvas
 from preferences import *
 import profoil_interface as p_intf
 
+from preferences import MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
+
 """
 Below is a monkey patch to handle a possible bug in matplotlib. 
 regardless of the back-end, matplotlib tool-bar home-button, doesn't appear to redraw even when the frameon=True. 
@@ -133,10 +135,10 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
 
     def loading_warning_dialog(self):
         """ pops a Message box with file loading error. """
-        return QMessageBox.warning(
+        return QMessageBox.question(
             self, 
             "Active Session", 
-            "Current design session is active and all data will be lost - Please confirm",
+            "Any unsaved data will be lost.\n          Continue?          ",
             QMessageBox.Yes | QMessageBox.Cancel)
 
     def save_planTextEdit_to_profoil(self):
@@ -187,12 +189,13 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     # Set the icon
-    app.setWindowIcon(QtGui.QIcon("profoil_ui.ico"))
+    app.setWindowIcon(QtGui.QIcon("icon.ico"))
     
     MainWindow = QtWidgets.QMainWindow()
     ui = ProfoilUI()
     ui.setupUi(MainWindow)
     ui.load_canvas()
     ui.connect_widget_events()
+    MainWindow.resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
     MainWindow.show()
     app.exec_()

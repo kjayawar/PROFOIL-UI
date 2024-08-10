@@ -57,7 +57,7 @@ AN_PRES_LINE_MARKERFACECOLOR    = "None"            # markers face color on ref 
 AN_PLOT_MARKERSIZE              = 3                 # All markers share the same size.
 AN_PLOT_LINEWIDTH               = 1                 # All lines share the same width.
 
-AN_PLOT_YLIMITS                 = (-20, 20)         # From -20 deg to +20 deg
+AN_PLOT_YLIMITS                 = (-20, 20)         # From -20 deg to ~ +20 deg
 AN_PLOT_XLIMITS_UPPER           = ( 37,  0)         # From -20 deg to +20 deg
 AN_PLOT_XLIMITS_LOWER           = ( 23, 60)         # From -20 deg to +20 deg
 AN_FLIP_YAXIS_LOWER_SURFACE     = True              # With this set, y-axis limits will be reversed
@@ -86,8 +86,12 @@ OVERLAY_MARKERFACECOLOR         = 'red'             # Overlay Plot marker color
 
 #================================= CONFIG RELATED TO UE & XY PLOTS ==================================
 
-
 UPPER_SURFACE_PHI_MARKER        = "^"               # Upward facing Triangular Phi Marks
 LOWER_SURFACE_PHI_MARKER        = "v"               # Downward facing Triangular Phi Marks
 UPPER_SURFACE_PHI_MARKER_SIZE   = 8                 # Phi marker size - upper Surface
 LOWER_SURFACE_PHI_MARKER_SIZE   = 8                 # Phi marker size - lower Surface
+
+#================================= CONFIG RELATED TO MAIN WINDOW ====================================
+
+MAIN_WINDOW_WIDTH               = 1250              # Main window width
+MAIN_WINDOW_HEIGHT              =  870              # Main window height
