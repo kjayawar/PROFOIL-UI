@@ -213,11 +213,10 @@ class ProfoilCanvas:
             self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
             if AN_FLIP_YAXIS_LOWER_SURFACE : 
                 self.an_ax.invert_yaxis()
-            # self.an_ax.set_ylim(*(tuple(reversed(AN_PLOT_YLIMITS)) if AN_FLIP_YAXIS_LOWER_SURFACE else AN_PLOT_YLIMITS))
+
         if self.active_surface == "Upper":
             self.an_ax.set_xlim(*AN_PLOT_XLIMITS_UPPER)
             self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
-            # self.an_ax.set_ylim(*AN_PLOT_YLIMITS)
 
     def clear_axes(self):
         """
@@ -700,7 +699,6 @@ class ProfoilCanvas:
         """
         Executes PROFOIL when the profoil.in file is ready in the WORKDIR
         """
-
         # execute profoil
         p_intf.exec_profoil()
 
@@ -726,7 +724,6 @@ class ProfoilCanvas:
         Before calling initial_plot its required to have run_from_profoil_in(...) called.
         """     
         self.select_surface("Upper", first_time =True)
-        self.gui_fig.canvas.draw()
 
     def load_in_file(self, in_file=None):
         """
@@ -739,7 +736,9 @@ class ProfoilCanvas:
         self.ready_to_interact = True
         p_intf.save2profoil_in(in_file.open().read())
         self.run_from_profoil_in()
-        self.initial_plot() 
+        self.initial_plot()
+        self.setup_axes_limits()
+        self.gui_fig.canvas.draw()
 
     def save_airfoil(self, out_file):
         """
