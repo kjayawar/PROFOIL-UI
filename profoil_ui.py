@@ -139,7 +139,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
             self, 
             "Active Session", 
             "Any unsaved data will be lost.\n          Continue?          ",
-            QMessageBox.Yes | QMessageBox.Cancel)
+            QMessageBox.Yes | QMessageBox.Cancel) if AIRFOIL_CHANGE_WARNING else QMessageBox.Yes
 
     def save_planTextEdit_to_profoil(self):
         """

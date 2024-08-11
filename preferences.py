@@ -95,3 +95,7 @@ LOWER_SURFACE_PHI_MARKER_SIZE   = 8                 # Phi marker size - lower Su
 
 MAIN_WINDOW_WIDTH               = 1250              # Main window width
 MAIN_WINDOW_HEIGHT              =  870              # Main window height
+
+#=======================================CONFIG RELATED DIALOGS=======================================
+
+AIRFOIL_CHANGE_WARNING          = True
