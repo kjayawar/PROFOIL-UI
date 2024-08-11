@@ -120,18 +120,26 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         self.select_surface(self.combo_switch_surface.itemText(event))
 
     def failure_error_dialog(self):
-        """ pops a Message box with convergence failure warning """
-        QMessageBox.critical(
-            self, 
-            "Error...", 
-            "Design Failed - Please check the .in File")
+        """ pops a Message box with convergence failure warning, without beep """
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Error...")
+        msg_box.setText("Design Failed - Please check the .in File")
+        
+        # Setting icon to avoid beep
+        msg_box.setIcon(QMessageBox.NoIcon)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
 
     def overlay_error_dialog(self):
-        """ pops a Message box with file loading error. """
-        QMessageBox.information(
-            self, 
-            "File loading Error...", 
-            "Please check the .dat File")
+        """ pops a Message box with file loading error, without beep """
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("File loading Error...")
+        msg_box.setText("Please check the .dat File")
+        
+        # Setting icon to avoid beep
+        msg_box.setIcon(QMessageBox.NoIcon)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
 
     def loading_warning_dialog(self):
         """ pops a Message box with file loading error. """
