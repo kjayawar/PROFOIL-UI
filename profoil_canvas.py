@@ -157,17 +157,6 @@ class ProfoilCanvas:
 
         self.gui_fig.subplots_adjust(left=0.05, right=0.98, top=0.96, bottom=0.08, hspace = 0.02, wspace=0.02)
         self.gui_fig.canvas.mpl_connect('button_press_event', self.on_click)
-        self.gui_fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
-
-    def on_motion(self, event):
-        """
-        Sets cross-hair cursor when the cursor is on an_ax and in the edit mode
-        """
-        if (event.inaxes == self.an_ax and self.edit_mode):
-            self.canvas.setCursor(QtCore.Qt.CrossCursor)
-        else:
-            self.canvas.setCursor(QtCore.Qt.ArrowCursor)
-
 
     def setup_axes(self):
         """
@@ -288,11 +277,17 @@ class ProfoilCanvas:
             self.cursor_edit_line_points.append([event.xdata,event.ydata])
             self.cursor_edit_line_points.sort()
             self.cursor_edit_line.set_data(*list(zip(*self.cursor_edit_line_points)))
+
             self.gui_fig.canvas.draw()
+            # Ensure cursor remains a crosshair during the edit process
+            self.canvas.setCursor(QtCore.Qt.CrossCursor)
 
         # Right Click and spline is actually built
         if event.button == 3:
             self.apply_edits(event)
+            # Reset to default cursor after applying edits
+            self.setCursor(QtCore.Qt.ArrowCursor)
+
             self.gui_fig.canvas.draw()
 
     def backup_zoomed_limits(self, surface):
@@ -408,7 +403,10 @@ class ProfoilCanvas:
         self.reset_toolbar()
         self.edit_mode = not self.edit_mode
         self.btn_start_edits.setStyleSheet('QPushButton {color: red;}' if self.edit_mode else 'QPushButton {color: black;}')
-        if not self.edit_mode:
+        if self.edit_mode:
+            self.canvas.setCursor(QtCore.Qt.CrossCursor)  # Keep crosshair during edit mode
+        else:
+            self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor when exiting edit mode
             self.cancel_cursor_inputs()
 
     def cancel_cursor_inputs(self, event=None):
@@ -421,6 +419,7 @@ class ProfoilCanvas:
         self.cursor_edit_line.set_data([],[])
         self.cursor_edit_line_points = self.cursor_edit_line.get_xydata().tolist()
         self.set_edit_mode_off()
+        self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor on the canvas
         self.gui_fig.canvas.draw()
 
     def apply_edits(self, event):
@@ -439,6 +438,7 @@ class ProfoilCanvas:
             self.nu_alfa.set_ydata(np.where(np.isnan(new_y), y_data, new_y))
         self.save_edits_to_file()
         self.cancel_cursor_inputs()
+        self.canvas.setCursor(QtCore.Qt.ArrowCursor) # Reset to default cursor on the canvas
 
     def save_edits_to_file(self):
         """
