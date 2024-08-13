@@ -54,7 +54,7 @@ Most of the details outlining the implementations are inserted to file headers a
 
 Documentation files (DevDoc and UserManual) are first written in markdown. I used MarkText for this and the files were later been converted to HTML format for offline use. So please use the same workflow so that it ensures both .md and .html files are in sync. 
 
-![Documentation Flow](./doc_media/Documentation.png) 
+<img src="./doc_media/Documentation.png" alt="Documentation Flow" width="50%">
 
 ## Test Cases
 
