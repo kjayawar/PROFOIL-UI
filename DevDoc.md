@@ -54,62 +54,62 @@ Most of the details outlining the implementations are inserted to file headers a
 
 Documentation files (DevDoc and UserManual) are first written in markdown. I used MarkText for this and the files were later been converted to HTML format for offline use. So please use the same workflow so that it ensures both .md and .html files are in sync. 
 
-<img src="./doc_media/Documentation.png" alt="Documentation Flow" width="50%">
+![Documentation Flow](./doc_media/Documentation.png) 
 
 ## Test Cases
 
-**Action : File -> Open**
+**Action : File -> Open**     
 Expected Result: opens a file and shows Ue distribution, xy coordinates and alpha*-phi distribution and summary.
 
-**Action: Switch to File View**
+**Action: Switch to File View**     
 Expected Result: Populated text in Profoil.in and Profoil.log text boxes
 
-**Action: Switch back to Design View**
+**Action: Switch back to Design View**     
 Expected Result : plots stays as is without being changed. 
 
-**Action: Untick Grid / Tick Grid**
+**Action: Untick Grid / Tick Grid**     
 Expected Result : Grid on alpha*-phi distribution turns on and off
 
-**Action: Switch to Lower surface**
+**Action: Switch to Lower surface**     
 Expected Result : Ue and XY plots stays the same. alpha*-phi distribution shows lower surface data. 
 
-**Action : Zoom** in and out using "Zoom to rectangle" button.
+**Action : Zoom** in and out using "Zoom to rectangle" button.     
 Expected Result : Zooms in and out keeping the same aspect ratio.
 
-**Action: Switch surface without pressing home button**
+**Action: Switch surface without pressing home button**     
 Expected Result : Upon returning lower or upper surface, the zoomed out plot statys zoomed out. 
 
-**Action: Start Edits**
+**Action: Start Edits**     
 Expected Result : 
                 Start Edits button text turn red indication edit mode. 
                 When in alpha*-phi plot the cursor becomes cross-hair
                 Left click allows the user to add cursor edits showing as a red line
 
-**Action: Cancel**
+**Action: Cancel**     
 Expected Result : red cursor line disapears and no data is changed
 
-**Action : Apply Edits** (After Start Edits)
+**Action : Apply Edits** (After Start Edits)     
 Expected Result : The green line that prescribes the alpha*-phi distribution gets the cursor edit data from the red line.
-**Action : Undo**
+**Action : Undo**     
 Expected Result: The green line gets the previous alpha*-phi distribution which was there before the Edits.
 
-**Action : Plot From File** (Change the profoil.in file in the File View. Do some changes to the FOIL lines and then in the Design View -> click Plot From File)
+**Action : Plot From File** (Change the profoil.in file in the File View. Do some changes to the FOIL lines and then in the Design View -> click Plot From File)     
 Expected Result: The changes made in the FOIL lines should reflect in the alpha*-phi distribution including any alpha*-phi changes and/or any newly introduced FOIL lines.
 
-**Action : Run Profoil** (After doing some minute change either in Design View or File View)
+**Action : Run Profoil** (After doing some minute change either in Design View or File View)     
 Expected Result : New set of Ue , xy and alpha*-phi showing old and new data
 
-**Action : Untick/Tick History**
+**Action : Untick/Tick History**     
 Expected Result : Dashed gray history lines apprear/disapear as applicable. 
 
-**Action : Revert** (After doing some Edits and then Run Profoil)
+**Action : Revert** (After doing some Edits and then Run Profoil)     
 Expected Result : The green line gets the alpha*-phi distribution that was there before the edits.
 
-**Action : Overlay** -> Select a saved xy file or XFoil dat file. 
+**Action : Overlay** -> Select a saved xy file or XFoil dat file.      
 Expected Result: The geometry should appear in a dotted red line in the xy plot
 
-**Action : Clear Overlay**
+**Action : Clear Overlay**     
 Expected Result : Overlay line disapears.
 
-**Action : Open at least 10 differnt airfoil .in files**
+**Action : Open at least 10 differnt airfoil .in files**     
 Expected Result : on each open airfoils open in the window without messing up the plot limts, AR etc. 
