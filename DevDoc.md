@@ -54,7 +54,7 @@ Most of the details outlining the implementations are inserted to file headers a
 
 Documentation files (DevDoc and UserManual) are first written in markdown. I used MarkText for this and the files were later been converted to HTML format for offline use. So please use the same workflow so that it ensures both .md and .html files are in sync. 
 
-<img src="./doc_media/Documentation.png" alt="Documentation Flow" width="50%">
+![Documentation](./doc_media/Documentation.png)
 
 ## Test Cases
 
@@ -80,16 +80,17 @@ Expected Result : Zooms in and out keeping the same aspect ratio.
 Expected Result : Upon returning lower or upper surface, the zoomed out plot statys zoomed out. 
 
 **Action: Start Edits**     
-Expected Result : 
-                Start Edits button text turn red indication edit mode. 
-                When in alpha*-phi plot the cursor becomes cross-hair
-                Left click allows the user to add cursor edits showing as a red line
+Expected Result :     
+        -Start Edits button text turn red indication edit mode. 
+        -When in alpha*-phi plot the cursor becomes cross-hair
+        -Left click allows the user to add cursor edits showing as a red line
 
 **Action: Cancel**     
 Expected Result : red cursor line disapears and no data is changed
 
 **Action : Apply Edits** (After Start Edits)     
 Expected Result : The green line that prescribes the alpha*-phi distribution gets the cursor edit data from the red line.
+
 **Action : Undo**     
 Expected Result: The green line gets the previous alpha*-phi distribution which was there before the Edits.
 
