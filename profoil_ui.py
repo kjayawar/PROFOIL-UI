@@ -22,6 +22,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
+# syntax highlighting
+from PyQt5.QtCore import Qt, QRegExp
+from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
+from PyQt5.QtWidgets import QPlainTextEdit
 
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -47,6 +51,30 @@ def patched_home(self, *args, **kwargs):
     home(self, *args, **kwargs)
     ui.setup_axes_limits()
 NavigationToolbar.home = patched_home
+
+
+class CommentHighlighter(QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        super(CommentHighlighter, self).__init__(parent)
+        # Define the format for comment lines
+        self.comment_format = QTextCharFormat()
+        self.comment_format.setForeground(QColor("green"))
+        self.comment_format.setFontWeight(QtGui.QFont.Bold)
+
+    def highlightBlock(self, text):
+        # Regular expression to match lines starting with #
+        # comment_pattern = QRegExp(r"^#.*")
+
+        # Regular expression to match lines starting with # or ! with optional leading whitespace
+        comment_pattern = QRegExp(r'^\s*[#!].*')
+
+        index = comment_pattern.indexIn(text)
+
+        while index >= 0:
+            length = comment_pattern.matchedLength()
+            # Apply the comment format to the matched text
+            self.setFormat(index, length, self.comment_format)
+            index = comment_pattern.indexIn(text, index + length)
 
 class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
     def __init__(self):
@@ -104,6 +132,9 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
         self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
 
+        # Apply the syntax highlighter to the profoil.in text editor
+        self.highlighter = CommentHighlighter(self.plainTextEdit_profoil_in.document())
+
         # Connect textChanged signal to slot
         self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
 
@@ -112,7 +143,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         Indicates there are some unsaved changes in the profoil.in file
         by changing the color of the "Save" button
         """
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red;}')
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
 
     def switch_surface(self, event):
         """
@@ -158,7 +189,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         p_intf.save2profoil_in(self.plainTextEdit_profoil_in.toPlainText())
 
         # upon saving change the save button color back to black
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black; font-style: normal;}')
 
     def menu_file_open(self):
         """
