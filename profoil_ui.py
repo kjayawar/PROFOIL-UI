@@ -178,13 +178,13 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         """
         opens profoil.in file, if a session is current, warning will be shown.
         """
-        if (self.ready_to_interact and not KEEP_OLD_AIRFOIL_UPON_LOADING):
-            if self.loading_warning_dialog() == QMessageBox.Yes:
-                self.active_surface = "Upper"
+        if self.ready_to_interact:
+            if self.loading_warning_dialog() != QMessageBox.Yes:
+                return
+            self.active_surface = "Upper"
+            if not KEEP_OLD_AIRFOIL_UPON_LOADING:
                 self.setup_axes()
                 self.clear_axes()
-            else:
-                return
 
         filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
         if filename:
@@ -201,7 +201,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
     def overlay_file_open(self, skiprows):
         """
-        overlays *.dat file
+        Overlays *.xy or *.dat file based on skiprows (0 for .xy, 1 for .dat)
         """
         filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'.', "All Files (*.*)")[0]
         if filename:
