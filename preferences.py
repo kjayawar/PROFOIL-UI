@@ -78,12 +78,25 @@ UE_PLOT_COLOR                   = None              # UE Plot , line color of th
 XY_PLOT_LINEWIDTH               = 1                 # XY Plot line width
 XY_PLOT_COLOR                   = "black"           # XY Plot line color
 
-OVERLAY_LINEWIDTH               = 1                 # Overlay Plot line width                   
-OVERLAY_LINESTYLE               = '--'              # Overlay Plot line style
-OVERLAY_LINE_MARKER             = "."               # Overlay Plot line marker
-OVERLAY_LINE_COLOR              = 'red'             # Overlay Plot line color
-OVERLAY_MARKERSIZE              = 5                 # Overlay Plot marker size
-OVERLAY_MARKERFACECOLOR         = 'red'             # Overlay Plot marker color
+# ==================================== CONFIG RELATED TO OVERLAY =====================================
+
+# High contrast airfoil xy overlay
+
+# OVERLAY_LINEWIDTH               = 1                 # Overlay Plot line width                   
+# OVERLAY_LINESTYLE               = '--'              # Overlay Plot line style
+# OVERLAY_LINE_MARKER             = "."               # Overlay Plot line marker
+# OVERLAY_LINE_COLOR              = 'red'             # Overlay Plot line color
+# OVERLAY_MARKERSIZE              = 5                 # Overlay Plot marker size
+# OVERLAY_MARKERFACECOLOR         = 'red'             # Overlay Plot marker color
+
+# Low contrast airfoil xy overlay
+
+OVERLAY_LINEWIDTH               = 0.7               # Overlay Plot line width                   
+OVERLAY_LINESTYLE               = '-'               # Overlay Plot line style
+OVERLAY_LINE_MARKER             = ""                # Overlay Plot line marker
+OVERLAY_LINE_COLOR              = 'green'           # Overlay Plot line color
+OVERLAY_MARKERSIZE              = None              # Overlay Plot marker size
+OVERLAY_MARKERFACECOLOR         = None              # Overlay Plot marker color
 
 #================================= CONFIG RELATED TO UE & XY PLOTS ==================================
 
@@ -97,6 +110,7 @@ LOWER_SURFACE_PHI_MARKER_SIZE   = 8                 # Phi marker size - lower Su
 MAIN_WINDOW_WIDTH               = 1250              # Main window width
 MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
-#=======================================CONFIG RELATED DIALOGS=======================================
+#================================ CONFIG RELATED TO AIRFOIL LOADING =================================
 
 AIRFOIL_CHANGE_WARNING          = True
+KEEP_OLD_AIRFOIL_UPON_LOADING   = False

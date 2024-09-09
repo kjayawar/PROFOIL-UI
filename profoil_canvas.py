@@ -370,6 +370,15 @@ class ProfoilCanvas:
         else:
             self.toggle_previous_plots()
 
+    def toggle_airfoil_grid_lines(self, event):
+        """
+        Toggles the grid lines on the xy_ax (airfoil plot).
+        Will make effect immediately
+        """
+        grid_on = bool(event)
+        self.xy_ax.grid(grid_on)
+        self.gui_fig.canvas.draw()
+        
     def toggle_previous_plots(self, event):
         """
         Toggles the visibility of previous lines.
@@ -639,13 +648,13 @@ class ProfoilCanvas:
         self.lower_nu_alfa_modi.set_data(self.nu_lower, self.alfa_lower)
         self.lower_nu_alfa_current.set_data(self.nu_lower, self.alfa_lower)
 
-    def overlay_dat(self, datfile, skiprows):
+    def overlay_dat(self, filename, skiprows):
         """
         This function overlays a given DAT file contour in the xy plot.
         File formats with different number of header are supported
         """
         try:
-            x,y = np.loadtxt(Path(datfile), skiprows=skiprows).T
+            x,y = np.loadtxt(Path(filename), skiprows=skiprows).T
         except:
             self.overlay_error_dialog()
             return
@@ -673,6 +682,13 @@ class ProfoilCanvas:
 
         # upon updating  plainTextEdit_profoil_in change the save button color back to black
         self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
+
+    def update_converged_view(self):
+        """
+        Updates the text boxes in the File View tab
+        """
+        self.plainTextEdit_profoil_dmp.setPlainText(p_intf.catfile(WORKDIR/"profoil.dmp", tail=0))
+        self.plainTextEdit_profoil_xy.setPlainText(p_intf.catfile(WORKDIR/"profoil.xy", tail=0))
 
     def update_summary_text(self):
         """
@@ -711,6 +727,7 @@ class ProfoilCanvas:
         # conditional logic follows for the graphics
 
         self.update_file_view()
+        self.update_converged_view()
         
         if p_intf.is_design_converged():
             self.extract_all_profoil_data()

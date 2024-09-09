@@ -22,64 +22,36 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
-# syntax highlighting
-from PyQt5.QtCore import Qt, QRegExp
-from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
-from PyQt5.QtWidgets import QPlainTextEdit
-
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backend_bases import key_press_handler
 
 from GUIMainWindow import Ui_MainWindow
 from profoil_canvas import ProfoilCanvas
+from syntax_highligher import CommentHighlighter
+from dragndrop import DragDropWindow
 from preferences import *
 import profoil_interface as p_intf
 
 from preferences import MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
 
-"""
-Below is a monkey patch to handle a possible bug in matplotlib. 
-regardless of the back-end, matplotlib tool-bar home-button, doesn't appear to redraw even when the frameon=True. 
-This results in messed up axis limits on zoom-> home.
-Upon multiple failed attempts to fix this issue in a pragmatic way, below decorator is introduced
-to wrap the home button with an additional axis limit change. 
-"""
-
-home = NavigationToolbar.home
-def patched_home(self, *args, **kwargs):
-    home(self, *args, **kwargs)
-    ui.setup_axes_limits()
-NavigationToolbar.home = patched_home
-
-
-class CommentHighlighter(QSyntaxHighlighter):
-    def __init__(self, parent=None):
-        super(CommentHighlighter, self).__init__(parent)
-        # Define the format for comment lines
-        self.comment_format = QTextCharFormat()
-        self.comment_format.setForeground(QColor("green"))
-        self.comment_format.setFontWeight(QtGui.QFont.Bold)
-
-    def highlightBlock(self, text):
-        # Regular expression to match lines starting with #
-        # comment_pattern = QRegExp(r"^#.*")
-
-        # Regular expression to match lines starting with # or ! with optional leading whitespace
-        comment_pattern = QRegExp(r'^\s*[#!].*')
-
-        index = comment_pattern.indexIn(text)
-
-        while index >= 0:
-            length = comment_pattern.matchedLength()
-            # Apply the comment format to the matched text
-            self.setFormat(index, length, self.comment_format)
-            index = comment_pattern.indexIn(text, index + length)
-
-class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
+class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
     def __init__(self):
-        QtWidgets.QMainWindow.__init__(self)
+        DragDropWindow.__init__(self)
         ProfoilCanvas.__init__(self)
+
+        # Store the original home method
+        original_home = NavigationToolbar.home
+
+        # Monkey patch the home button to fix the axis limit issue
+        def patched_home(toolbar_instance, *args, **kwargs):
+            # Call the original home function
+            original_home(toolbar_instance, *args, **kwargs)
+            # Then call the setup_axes_limits method on the ProfoilUI instance
+            self.setup_axes_limits()
+
+        # Replace the home method in the toolbar with the patched version
+        NavigationToolbar.home = patched_home
 
     def load_canvas(self):
         """
@@ -95,7 +67,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         """
         creates a custom tool bar without unnecessary buttons to minimize confusion
         """
-        tool_bar = NavigationToolbar(self.canvas, None)
+        tool_bar = NavigationToolbar(self.canvas, self)
         selected_buttons = ['Home', 'Pan','Zoom','Save']
         for x in tool_bar.actions():
             if x.text() not in selected_buttons:
@@ -126,10 +98,10 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
 
         # CheckBox Events (History and Grid)
         self.checkBox_grid.stateChanged.connect(self.toggle_grid_lines)
+        self.checkBox_airfoil_grid.stateChanged.connect(self.toggle_airfoil_grid_lines)
         self.checkBox_history.stateChanged.connect(self.toggle_previous_plots)
 
         # Dropdown Events (Upper / Lower Surface Switch)
-        self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
         self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
 
         # Apply the syntax highlighter to the profoil.in text editor
@@ -137,6 +109,17 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
 
         # Connect textChanged signal to slot
         self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
+
+        # New connection for the "File | Save" button
+        self.btn_file_save.clicked.connect(self.menu_file_save)
+
+        # New connection for the "File | Open" button
+        self.btn_file_open.clicked.connect(self.menu_file_open)
+
+        # New connections for the "Overlay" buttons
+        self.btn_overlay_xy.clicked.connect(lambda:self.overlay_file_open(skiprows=0))
+        self.btn_overlay_dat.clicked.connect(lambda:self.overlay_file_open(skiprows=1))
+        self.btn_overlay_clear.clicked.connect(self.clear_overlay)
 
     def on_profoil_in_text_changed(self):
         """
@@ -191,11 +174,11 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         # upon saving change the save button color back to black
         self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black; font-style: normal;}')
 
-    def menu_file_open(self):
+    def menu_file_open(self, filename=None):
         """
         opens profoil.in file, if a session is current, warning will be shown.
         """
-        if self.ready_to_interact:
+        if (self.ready_to_interact and not KEEP_OLD_AIRFOIL_UPON_LOADING):
             if self.loading_warning_dialog() == QMessageBox.Yes:
                 self.active_surface = "Upper"
                 self.setup_axes()
@@ -203,7 +186,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
             else:
                 return
 
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
+        filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
         if filename:
             self.load_in_file(filename)
 
@@ -224,6 +207,7 @@ class ProfoilUI(QtWidgets.QMainWindow, Ui_MainWindow, ProfoilCanvas):
         if filename:
             self.overlay_dat(filename, skiprows)
 
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -231,11 +215,10 @@ if __name__ == "__main__":
     # Set the icon
     app.setWindowIcon(QtGui.QIcon("icon.ico"))
     
-    MainWindow = QtWidgets.QMainWindow()
     ui = ProfoilUI()
-    ui.setupUi(MainWindow)
+    ui.setupUi(ui)
     ui.load_canvas()
     ui.connect_widget_events()
-    MainWindow.resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
-    MainWindow.show()
+    ui.resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
+    ui.show()
     app.exec_()

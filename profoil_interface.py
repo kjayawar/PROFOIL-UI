@@ -239,9 +239,9 @@ def gen_input_template(filename=WORKDIR/"profoil.in"):
     As a precautionary measure, VELDIST will be set to 60 as well.
     """
     file_content            = open(filename).read()
-    foils_blk_devoided      = re.sub(r"^FOIL.*(?:\nFOIL.*)*$", r"{}",   file_content,       flags=re.M)
-    foils_ile_devoided      = re.sub(r"(^ILE\s+)\d+",          r"\1{}", foils_blk_devoided, flags=re.M)
-    foils_ile_vdist_fixed   = re.sub(r"^VELDIST\s+\d+",  r"VELDIST 60", foils_ile_devoided, flags=re.M)
+    foils_blk_devoided      = re.sub(r"^FOIL.*(?:\nFOIL.*)*$", r"{}",   file_content,       flags=re.M, count=1)
+    foils_ile_devoided      = re.sub(r"(^ILE\s+)\d+",          r"\1{}", foils_blk_devoided, flags=re.M, count=1)
+    foils_ile_vdist_fixed   = re.sub(r"^VELDIST\s+\d+",  r"VELDIST 60", foils_ile_devoided, flags=re.M, count=1)
     return foils_ile_vdist_fixed
 
 def gen_foil_line(nu, alpha, i, ile, delta_alpha=0):
@@ -261,6 +261,7 @@ def gen_input_file(nu_list, alpha_list, ile):
     foils_section = "\n".join([gen_foil_line(nu, alpha, i, ile) 
                                 for i, (nu, alpha) 
                                 in  enumerate(zip(nu_list,alpha_list), start=1)])
+
     save2profoil_in(file_template.format(foils_section, ile))
 
 def save2profoil_in(text, filename=WORKDIR/"profoil.in"):
