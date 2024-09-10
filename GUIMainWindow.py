@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'GUI_temp.ui'
+# Form implementation generated from reading ui file 'GUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -293,7 +293,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "~/work/profoil.in"))
         self.label_2.setText(_translate("MainWindow", "~/work/profoil.log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.FileView), _translate("MainWindow", "File View"))
-        self.label_5.setText(_translate("MainWindow", "~/work/profoi.xy"))
+        self.label_5.setText(_translate("MainWindow", "~/work/profoil.xy"))
         self.label_3.setText(_translate("MainWindow", "~/work/profoil.dmp"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ConvergedView), _translate("MainWindow", "Converged Data"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))

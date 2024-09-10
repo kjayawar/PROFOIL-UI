@@ -96,7 +96,7 @@ LOWER_SURFACE_PHI_MARKER_SIZE   = 8                 # Phi marker size - lower Su
 
 #================================= CONFIG RELATED TO MAIN WINDOW ====================================
 
-MAIN_WINDOW_WIDTH               = 1250              # Main window width
+MAIN_WINDOW_WIDTH               = 1300              # Main window width
 MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
 #================================ CONFIG RELATED TO AIRFOIL LOADING =================================
