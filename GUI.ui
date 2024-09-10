@@ -29,9 +29,9 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
-      <widget class="QWidget" name="widget">
+      <widget class="QWidget" name="DesignView">
        <attribute name="title">
         <string>Design View</string>
        </attribute>
@@ -356,7 +356,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="widget">
+      <widget class="QWidget" name="FileView">
        <attribute name="title">
         <string>File View</string>
        </attribute>
@@ -437,6 +437,57 @@
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>~/work/profoil.log</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="ConvergedView">
+       <attribute name="title">
+        <string>Converged Data</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>~/work/profoi.xy</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPlainTextEdit" name="plainTextEdit_profoil_dmp">
+          <property name="font">
+           <font>
+            <family>Courier</family>
+           </font>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPlainTextEdit" name="plainTextEdit_profoil_xy">
+          <property name="font">
+           <font>
+            <family>Courier</family>
+           </font>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>~/work/profoil.dmp</string>
           </property>
          </widget>
         </item>
