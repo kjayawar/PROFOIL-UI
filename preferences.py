@@ -117,5 +117,5 @@ SHORTCUT_TOGGLE_COMMENT         = "Ctrl+/"          # Shortcut for toggling comm
 
 #========================================== COMMENT STYLE ===========================================
 
-COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment indicators
+COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment markers
 COMMENT_COLOR                   = "green"           # Choose comment color
