@@ -67,3 +67,6 @@ class DragDropWindow(QtWidgets.QMainWindow):
         else:
             # Handle invalid file extensions
             self.invalid_file_dialog()
+
+        # Refocus the window after the drop
+        self.activateWindow()

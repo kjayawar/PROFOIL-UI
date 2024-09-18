@@ -22,6 +22,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 
+from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtGui import QKeySequence
+
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backend_bases import key_press_handler
@@ -31,9 +34,9 @@ from profoil_canvas import ProfoilCanvas
 from syntax_highligher import CommentHighlighter
 from dragndrop import DragDropWindow
 from preferences import *
-import profoil_interface as p_intf
+from annotate import annotate_text
 
-from preferences import MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT
+import profoil_interface as p_intf
 
 class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
     def __init__(self):
@@ -87,6 +90,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.btn_run_profoil.clicked.connect(self.run_profoil)
         self.btn_revert.clicked.connect(self.revert)
         self.btn_save_profoil_in.clicked.connect(self.save_planTextEdit_to_profoil)
+        self.btn_annotate.clicked.connect(self.annotate_profoil_in)
 
         # Menu Events
         self.actionOpen.triggered.connect(self.menu_file_open)
@@ -120,6 +124,38 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.btn_overlay_xy.clicked.connect(lambda:self.overlay_file_open(skiprows=0))
         self.btn_overlay_dat.clicked.connect(lambda:self.overlay_file_open(skiprows=1))
         self.btn_overlay_clear.clicked.connect(self.clear_overlay)
+
+        # Create the shortcut to trigger "File | Open"
+        self.open_shortcut = QShortcut(QKeySequence(SHORTCUT_OPEN), self)
+        self.open_shortcut.activated.connect(self.menu_file_open)
+
+        # Create the shortcut to trigger "Profoil.in Save"
+        self.save_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE), self)
+        self.save_shortcut.activated.connect(self.save_on_shortcut)
+
+        # Create the shortcut to trigger "Start Edits"
+        self.edit_shortcut = QShortcut(QKeySequence(SHORTCUT_EDIT), self)
+        self.edit_shortcut.activated.connect(self.start_cursor_edits)
+
+        # Create the shortcut to trigger "Run Profoil"
+        self.run_profoil_shortcut = QShortcut(QKeySequence(SHORTCUT_EXEC), self)
+        self.run_profoil_shortcut.activated.connect(self.run_profoil)
+
+        # Create the shortcut to switch to "Design View"
+        self.design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB1), self)
+        self.design_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(0))
+        
+        # Create the shortcut to switch to "File View"
+        self.file_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB2), self)
+        self.file_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(1))
+        
+        # Create the shortcut to switch to "Converged Data"
+        self.converged_data_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB3), self)
+        self.converged_data_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
+
+        # Create the shortcut to switch to "Toggle Comments"
+        self.toggle_comment_shortcut = QShortcut(QKeySequence(SHORTCUT_TOGGLE_COMMENT), self)
+        self.toggle_comment_shortcut.activated.connect(self.toggle_comment)
 
     def on_profoil_in_text_changed(self):
         """
@@ -207,6 +243,35 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         if filename:
             self.overlay_dat(filename, skiprows)
 
+    def save_on_shortcut(self):
+        # Check if the current tab is "File View" (index 1)
+        if self.tabWidget.currentIndex() == 1:
+            self.save_planTextEdit_to_profoil()
+
+    def toggle_comment(self):
+        cursor = self.plainTextEdit_profoil_in.textCursor()
+        # Check if the current tab is "File View" (index 1) and part of text is being selected
+        if (self.tabWidget.currentIndex() == 1 and cursor.hasSelection()):
+            selection = cursor.selection().toPlainText()
+            selected_lines = selection.split("\n")
+
+            modified_lines = [line.replace(COMMENT_MARKER, "", 1) if line.startswith(("#","!")) else f"{COMMENT_MARKER}{line}" for line in selected_lines]
+            cursor.insertText("\n".join(modified_lines))
+
+    def annotate_profoil_in(self):
+        """
+        note: setting text with setPlainText() just wont work here
+        because it wipes out the Qtextedit undo() stack
+        hence the cursor.intertText() is used here
+        """
+        annotated_text = annotate_text(self.plainTextEdit_profoil_in.toPlainText())
+        cursor = self.plainTextEdit_profoil_in.textCursor()
+        cursor.select(QtGui.QTextCursor.Document)
+        cursor.insertText(annotated_text)
+
+        # users should be able to undo the annotation straight away if not happy with the outcome
+        # hence the focus is set on the plainTextEdit_profoil_in
+        self.plainTextEdit_profoil_in.setFocus()
 
 if __name__ == "__main__":
     import sys

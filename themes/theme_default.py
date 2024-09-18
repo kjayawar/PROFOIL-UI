@@ -80,17 +80,6 @@ XY_PLOT_COLOR                   = "black"           # XY Plot line color
 
 # ==================================== CONFIG RELATED TO OVERLAY =====================================
 
-# High contrast airfoil xy overlay
-
-# OVERLAY_LINEWIDTH               = 1                 # Overlay Plot line width                   
-# OVERLAY_LINESTYLE               = '--'              # Overlay Plot line style
-# OVERLAY_LINE_MARKER             = "."               # Overlay Plot line marker
-# OVERLAY_LINE_COLOR              = 'red'             # Overlay Plot line color
-# OVERLAY_MARKERSIZE              = 5                 # Overlay Plot marker size
-# OVERLAY_MARKERFACECOLOR         = 'red'             # Overlay Plot marker color
-
-# Low contrast airfoil xy overlay
-
 OVERLAY_LINEWIDTH               = 0.7               # Overlay Plot line width                   
 OVERLAY_LINESTYLE               = '-'               # Overlay Plot line style
 OVERLAY_LINE_MARKER             = ""                # Overlay Plot line marker
@@ -114,3 +103,19 @@ MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
 AIRFOIL_CHANGE_WARNING          = True
 KEEP_OLD_AIRFOIL_UPON_LOADING   = False
+
+#======================================== KEYBOARD SHORTCUTS ========================================
+
+SHORTCUT_OPEN                   = "Ctrl+O"          # Shortcut for File | Open Dialog     
+SHORTCUT_SAVE                   = "Ctrl+S"          # Shortcut for profoil.in file save in FileView
+SHORTCUT_EDIT                   = "Ctrl+E"          # Shortcut for Start Edits 
+SHORTCUT_EXEC                   = "Ctrl+R"          # Shortcut for Run PROFOIL
+SHORTCUT_TAB1                   = "Ctrl+1"          # Shortcut for switching tab to "Design View"
+SHORTCUT_TAB2                   = "Ctrl+2"          # Shortcut for switching tab to "File View"
+SHORTCUT_TAB3                   = "Ctrl+3"          # Shortcut for switching tab to "Converged View"
+SHORTCUT_TOGGLE_COMMENT         = "Ctrl+/"          # Shortcut for toggling comment lines
+
+#========================================== COMMENT STYLE ===========================================
+
+COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment indicators
+COMMENT_COLOR                   = "green"           # Choose comment color

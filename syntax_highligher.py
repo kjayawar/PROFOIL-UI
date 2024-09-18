@@ -23,12 +23,14 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor
 from PyQt5.QtCore import QRegExp
 
+from preferences import COMMENT_COLOR
+
 class CommentHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
         super(CommentHighlighter, self).__init__(parent)
         # Define the format for comment lines
         self.comment_format = QTextCharFormat()
-        self.comment_format.setForeground(QColor("green"))
+        self.comment_format.setForeground(QColor(COMMENT_COLOR))
         self.comment_format.setFontWeight(QtGui.QFont.Bold)
 
     def highlightBlock(self, text):

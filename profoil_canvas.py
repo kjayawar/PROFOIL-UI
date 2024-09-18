@@ -265,7 +265,7 @@ class ProfoilCanvas:
         self.gui_fig.canvas.draw()
 
             
-    def on_click(self, event):
+    def on_click(self, event=None):
         """
         All the mouse click events go here
         """
@@ -370,7 +370,7 @@ class ProfoilCanvas:
         else:
             self.toggle_previous_plots()
 
-    def toggle_airfoil_grid_lines(self, event):
+    def toggle_airfoil_grid_lines(self, event=None):
         """
         Toggles the grid lines on the xy_ax (airfoil plot).
         Will make effect immediately
@@ -379,7 +379,7 @@ class ProfoilCanvas:
         self.xy_ax.grid(grid_on)
         self.gui_fig.canvas.draw()
         
-    def toggle_previous_plots(self, event):
+    def toggle_previous_plots(self, event=None):
         """
         Toggles the visibility of previous lines.
         Will make effect from the next plot - not on the current plot
@@ -396,7 +396,7 @@ class ProfoilCanvas:
                 marker.set_visible(self.SHOW_PREV_LINES)
         self.gui_fig.canvas.draw()
 
-    def toggle_grid_lines(self, event):
+    def toggle_grid_lines(self, event=None):
         """
         Toggles the grid lines on the an_ax.
         Will make effect immediately
@@ -409,7 +409,7 @@ class ProfoilCanvas:
         self.edit_mode = False
         self.btn_start_edits.setStyleSheet('QPushButton {color: black;}')
 
-    def start_cursor_edits(self, event):
+    def start_cursor_edits(self, event=None):
         self.reset_toolbar()
         self.edit_mode = not self.edit_mode
         self.btn_start_edits.setStyleSheet('QPushButton {color: red;}' if self.edit_mode else 'QPushButton {color: black;}')
@@ -432,7 +432,7 @@ class ProfoilCanvas:
         self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor on the canvas
         self.gui_fig.canvas.draw()
 
-    def apply_edits(self, event):
+    def apply_edits(self, event=None):
         """
         Cursor edits are applied to the green line from the red line
         """
@@ -461,7 +461,7 @@ class ProfoilCanvas:
         p_intf.gen_buffer()
         p_intf.gen_input_file(nu_list, alfa_list, len(nu_upper))
 
-    def undo_edits(self, event):
+    def undo_edits(self, event=None):
         """
         This callback function resets the modifiable phi-alpha* distribution
         back to the current converged data from the most recent run. 
@@ -476,7 +476,7 @@ class ProfoilCanvas:
         self.save_edits_to_file()
         self.gui_fig.canvas.draw()
 
-    def plot_from_file(self, event):
+    def plot_from_file(self, event=None):
         """
         Reads profoil.in file in the work directory and updates the green line
         This action confirms any manual modifications if applicable
@@ -511,7 +511,7 @@ class ProfoilCanvas:
         self.run_from_profoil_in()
         self.gui_fig.canvas.draw()
 
-    def revert(self, event):
+    def revert(self, event=None):
         """
         This callback function loads the converged data from the previous run
         typically used when something goes wrong with the current run.
