@@ -23,22 +23,22 @@ from collections import namedtuple
 
 #======================================== IFTP.. Definitions ========================================
 IFTP1_dict = {
-	100 : "K_s",
+	100 : "K_S (trailing edge thickness parameter)",
 	101 : "c_m0",
 	102 : "t/c_max",
 	103 : "alfa_0 (rarely used)",
 	104 : "xc_max location of maximum thickness",
-	105 : "camber_max",
+	105 : "maximum camber",
 	106 : "leading edge radius",
 	107 : "t/c_max according to Eppler code",
 	121 : "t/c_max for a gensym airfoil",
 	122 : "flap angle for a gensym airfoil",
 	135 : "area (uses value for CHORDO for chord length)",
 	146 : "volume of an axisymmetric body produced by a symmetric airfoil rotated about the x-axis",
-	155 : "TEX - trailing edge offset in x",
-	156 : "TEY - trailing edge offset in y (i.e., TE thickness)",
-	157 : "XTEMIDPT - [X] Trailing Edge MIDPoinT in x (relative to x = 1)",
-	158 : "YTEMIDPT - [Y] Trailing Edge MIDPoinT in y",
+	155 : "TEX (Trailing Edge offset in X)",
+	156 : "TEY (Trailing Edge offset in Y, i.e., TE thickness)",
+	157 : "XTEMIDPT (Trailing Edge MIDPoinT in X -- relative to x = 1)",
+	158 : "YTEMIDPT (Trailing Edge MIDPoinT in Y)",
 	184 : "omega_us",
 	185 : "omega_ls",
 	190 : "mu_us",
@@ -61,25 +61,25 @@ IFTP1_dict = {
 	401 : "s/c",
 	402 : "y/c",
 	403 : "angle (used to design flat bottomed airfoils)",
-	500 : "H_12 @ AoA = segment alpha*",
-	501 : "R_delta2 @ AoA = segment alpha*",
-	502 : "TC @ AoA = segment alpha*",
-	503 : "n_ENN @ AoA = segment alpha*",
-	504 : "n_Drela @ AoA = segment alpha*",
-	505 : "H_32 @ AoA = segment alpha*",
-	506 : "c_f @ AoA = segment alpha*",
+	500 : "H_12 when AoA is segment alpha*",
+	501 : "R_delta2 when AoA is segment alpha*",
+	502 : "TC when AoA is segment alpha*",
+	503 : "n_ENN when AoA is segment alpha*",
+	504 : "n_Drela when AoA is segment alpha*",
+	505 : "H_32 when AoA is segment alpha*",
+	506 : "c_f when AoA is segment alpha*",
 	600 : "H_12",
 	601 : "H_32",
 }
 
 IFTP2_dict = {
-	100 : "v(s) @ AoA = segment alpha*",
-	200 : "H_12(s) @ AoA = segment alpha*",
-	201 : "TC(s) @ AoA = segment alpha*",
-	202 : "n(s)_ENN @ AoA = segment alpha*",
-	203 : "n(s)_Drela @ AoA = segment alpha*",
-	204 : "H_32(s) @ AoA = segment alpha*",
-	205 : "C_f(s) @ AoA = segment alpha*",
+	100 : "v(s) when AoA is segment alpha*",
+	200 : "H_12(s) when AoA is segment alpha*",
+	201 : "TC(s) when AoA is segment alpha*",
+	202 : "n(s)_ENN when AoA is segment alpha*",
+	203 : "n(s)_Drela when AoA is segment alpha*",
+	204 : "H_32(s) when AoA is segment alpha*",
+	205 : "C_f(s) when AoA is segment alpha*",
 	300 : "H_32(s) for given Re(R1) and alfa(R2) --[allows for iteration on alpha*]",
 	500 : "Bubble ramp"
 }
@@ -87,15 +87,15 @@ IFTP2_dict = {
 #======================================== ITP.. Definitions =========================================
 ITP_1_val_dict ={
 	1 : "Phi of seg {}",
-	4 : "Vi (allowed only once) of seg {}",
+	4 : "Vi (iteration on velocity level allowed only once) of seg {}",
 	5 : "Vi_tilde of seg {}",
 	6 : "alpha* of seg {}",
 }
 
 ITP_2_val_dict = {
 	0:{
-	1 : "DELSX - used to get trailing edge thickness in x",
-	2 : "DELXY - used to get trailing edge thickness in y",
+	1 : "DELSX - used to get TEX (trailing edge thickness in x)",
+	2 : "DELXY - used to get TEY (trailing edge thickness in y)",
 	3 : "XMAPOFF - used to get XTEMIDPT",
 	4 : "YMAPOFF - used to get YTEMIDPT",
 	},
@@ -156,48 +156,48 @@ LLBE_dict = {
 
 # ======================================= NEWT1.. Descriptions =======================================
 NEWT1G0_description = """
-# Drive {} ==> {}; 
+# Specify {} => {}; 
 # By iterating on {}.
 {}{}"""
 
 NEWT1G1_description = """
-# Drive {} ==> {} @ {}; 
+# Specify {} => {} @ {}; 
 # By iterating on {}.
 {}{}"""
 
 NEWT1S0_description = """
-# Drive {} at the {} {} ==> {}; 
+# Specify {} at the {} {} => {}; 
 # By iterating on {}.
 {}{}"""
 
 NEWT1S1_description = """
-# Drive {} ==> {} at the {} {} for Re={};
+# Specify {} => {} at the {} {} for Re={};
 # By iterating on {}.
 {}{}"""
 
 NEWT1S2_description = """
-# Drive {} ==> {} at the {} {} @ AoA of {} degrees and Re={}; 
+# Specify {} => {} at the {} {} @ AoA of {} degrees and Re={}; 
 # By iterating on {}.
 {}{}"""
 
 # ======================================= NEWT2.. Descriptions =======================================
 
 NEWT2SD0_description = """
-# Drive {}
+# Specify {}
 # By iterating DELV segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
 # Specs are {}
 {}{}"""
 
 NEWT2SD1_description = """
-# Drive {}
+# Specify {}
 # By iterating DELV segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
 # Specs are {} for given Re = {}
 {}{}"""
 
 NEWT2SD2_description = """
-# Drive {}
+# Specify {}
 # By iterating DELV segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
 # Specs are {} for given Re = {} and alfa = {}

@@ -101,8 +101,9 @@ MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
 #================================ CONFIG RELATED TO AIRFOIL LOADING =================================
 
-AIRFOIL_CHANGE_WARNING          = True
-KEEP_OLD_AIRFOIL_UPON_LOADING   = False
+AIRFOIL_CHANGE_WARNING          = True              # A warning dialog upon changing active session
+KEEP_OLD_AIRFOIL_UPON_LOADING   = False             # Old airfoil data is preserved upon switching
+                                                    # when set to True
 
 #======================================== KEYBOARD SHORTCUTS ========================================
 
@@ -114,8 +115,9 @@ SHORTCUT_TAB1                   = "Ctrl+1"          # Shortcut for switching tab
 SHORTCUT_TAB2                   = "Ctrl+2"          # Shortcut for switching tab to "File View"
 SHORTCUT_TAB3                   = "Ctrl+3"          # Shortcut for switching tab to "Converged View"
 SHORTCUT_TOGGLE_COMMENT         = "Ctrl+/"          # Shortcut for toggling comment lines
+SHORTCUT_ANNOTATE               = "Ctrl+A"          # Shortcut for annotating profoil.in file
 
 #========================================== COMMENT STYLE ===========================================
 
-COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment indicators
+COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment markers
 COMMENT_COLOR                   = "green"           # Choose comment color

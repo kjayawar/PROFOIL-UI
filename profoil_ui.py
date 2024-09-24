@@ -153,9 +153,13 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.converged_data_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB3), self)
         self.converged_data_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
 
-        # Create the shortcut to switch to "Toggle Comments"
+        # Create the shortcut for "Toggle Comments"
         self.toggle_comment_shortcut = QShortcut(QKeySequence(SHORTCUT_TOGGLE_COMMENT), self)
         self.toggle_comment_shortcut.activated.connect(self.toggle_comment)
+
+        # Create the shortcut for "Annotate"
+        self.annotate_shortcut = QShortcut(QKeySequence(SHORTCUT_ANNOTATE), self)
+        self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
     def on_profoil_in_text_changed(self):
         """
@@ -255,21 +259,25 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             selection = cursor.selection().toPlainText()
             selected_lines = selection.split("\n")
 
-            modified_lines = [line.replace(COMMENT_MARKER, "", 1) if line.startswith(("#","!")) else f"{COMMENT_MARKER}{line}" for line in selected_lines]
+            modified_lines = [line[1:] if line.startswith(("#","!")) else COMMENT_MARKER+line for line in selected_lines]
             cursor.insertText("\n".join(modified_lines))
 
     def annotate_profoil_in(self):
         """
         note: setting text with setPlainText() just wont work here
         because it wipes out the Qtextedit undo() stack
-        hence the cursor.intertText() is used here
+        hence the cursor.intertText() is used
         """
-        annotated_text = annotate_text(self.plainTextEdit_profoil_in.toPlainText())
         cursor = self.plainTextEdit_profoil_in.textCursor()
-        cursor.select(QtGui.QTextCursor.Document)
+        if cursor.hasSelection():
+            annotated_text = annotate_text(cursor.selection().toPlainText())
+        else:
+            annotated_text = annotate_text(self.plainTextEdit_profoil_in.toPlainText())
+            cursor.select(QtGui.QTextCursor.Document)
+        
         cursor.insertText(annotated_text)
-
-        # users should be able to undo the annotation straight away if not happy with the outcome
+        
+        # users should be able to undo the annotation straight away if the outcome is not satisfactory
         # hence the focus is set on the plainTextEdit_profoil_in
         self.plainTextEdit_profoil_in.setFocus()
 

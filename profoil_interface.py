@@ -304,7 +304,7 @@ def extract_summary(filename=WORKDIR/"profoil.log"):
     If airfoil name is prescribed in the *.in file the name will be extracted too
     """
     text = open(filename).read()
-    stats = re.findall('\*{5}STATISTICS\*{5}\n(.*)|$', text, flags=re.DOTALL)[0]
+    stats = re.findall(r'\*+\s*STATISTICS\s*\*+\n((?:.*\n){14})', text)[0]
     airfoil_name = re.findall("Airfoil Name:(.*)|$", text)[0].strip()
     
     # Strip spaces from each line of stats

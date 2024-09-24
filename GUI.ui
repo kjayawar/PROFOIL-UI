@@ -33,7 +33,7 @@
       </property>
       <widget class="QWidget" name="DesignView">
        <attribute name="title">
-        <string>DesignView</string>
+        <string>Design View</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="6,1,0">
         <item>
@@ -420,7 +420,7 @@
           <item>
            <widget class="QPushButton" name="btn_annotate">
             <property name="text">
-             <string>Annotate</string>
+             <string>Annotate (Ctrl+A)</string>
             </property>
            </widget>
           </item>
