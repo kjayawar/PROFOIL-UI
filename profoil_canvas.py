@@ -757,12 +757,13 @@ class ProfoilCanvas:
         2. copies *.in file in to WORKDIR as profoil.in
         3. Runs PROFOIL
         """
-        in_file = Path(in_file) if in_file else Path(input("Please specify the input file: "))
         self.ready_to_interact = True
-        p_intf.save2profoil_in(in_file.open().read())
+        p_intf.save2profoil_in(Path(in_file).open().read())
         self.run_from_profoil_in()
         self.initial_plot()
-        self.setup_axes_limits()
+        if not KEEP_OLD_AIRFOIL_UPON_LOADING:
+            self.setup_axes_limits()
+            self.clear_axes()
         self.gui_fig.canvas.draw()
 
     def save_airfoil(self, out_file):

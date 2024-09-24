@@ -220,10 +220,8 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         if self.ready_to_interact:
             if self.loading_warning_dialog() != QMessageBox.Yes:
                 return
-            self.active_surface = "Upper"
-            if not KEEP_OLD_AIRFOIL_UPON_LOADING:
-                self.setup_axes()
-                self.clear_axes()
+            # select "Upper" surface
+            self.combo_switch_surface.setCurrentIndex(0)
 
         filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
         if filename:
