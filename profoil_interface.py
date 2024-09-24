@@ -179,7 +179,7 @@ def extract_all_data():
 
     # extract row data from output files
     phi, vel = extract_vel()
-    nu, alfa, ile, (phis_upper, phis_lower) = extract_dmp()
+    nu_spec, alfa_spec, ile, (phis_upper, phis_lower) = extract_dmp(WORKDIR/"profoil.in")
     x,y = extract_xy()
 
     # create splines
@@ -204,13 +204,22 @@ def extract_all_data():
 
     NU2PHI = 6 # degrees around the circle / nu_max in the FOIL lines which is 60.
 
-    nu_upper = nu[:ile].tolist()
-    alfa_upper = alfa[:ile].tolist()
-    upper_markes_phi = np.array([phis_upper] + nu_upper) * NU2PHI
+    nu_spec_upper = nu_spec[:ile].tolist()
+    alfa_spec_upper = alfa_spec[:ile].tolist()
+    upper_markes_phi = np.array([phis_upper] + nu_spec_upper) * NU2PHI
 
-    nu_lower = nu[ile:].tolist()
-    alfa_lower = alfa[ile:].tolist()
-    lower_markes_phi = np.array(nu_lower + [phis_lower]) * NU2PHI
+    nu_spec_lower = nu_spec[ile:].tolist()
+    alfa_spec_lower = alfa_spec[ile:].tolist()
+    lower_markes_phi = np.array(nu_spec_lower + [phis_lower]) * NU2PHI
+
+    # converged nu-alfa pairs
+    nu_conv, alfa_conv, *_ = extract_dmp(WORKDIR/"profoil.dmp")
+    
+    nu_conv_upper = nu_conv[:ile].tolist()
+    alfa_conv_upper = alfa_conv[:ile].tolist()
+
+    nu_conv_lower = nu_conv[ile:].tolist()
+    alfa_conv_lower = alfa_conv[ile:].tolist()
 
     # Triangular marker positions on upper and lower surfaces are determined using the previously
     # transformed phi values. This is done on upper and lower surface velocity distributions
@@ -229,7 +238,8 @@ def extract_all_data():
 
     return  x,y, xy_marker_upper, xy_marker_lower, \
             ue_lines, upper_vel_markers, lower_vel_markers, \
-            nu_upper, alfa_upper, nu_lower, alfa_lower, ile
+            nu_spec_upper, alfa_spec_upper, nu_spec_lower, alfa_spec_lower, ile, \
+            nu_conv_upper, alfa_conv_upper, nu_conv_lower, alfa_conv_lower
 
 def gen_input_template(filename=WORKDIR/"profoil.in"):
     """

@@ -106,7 +106,7 @@ class ProfoilCanvas:
         # during the program execution these lines will not be re-plotted.
 
         self.upper_nu_alfa_previous   = plt.Line2D([],[], linestyle=AN_PREV_LINE_LINESTYLE, marker=AN_PREV_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_PREV_LINE_COLOR, markerfacecolor=AN_PREV_LINE_MARKERFACECOLOR, clip_on=False)
-        self.upper_nu_alfa_current    = plt.Line2D([],[], linestyle=AN_CURR_LINE_LINESTYLE, marker=AN_CURR_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_CURR_LINE_COLOR, markerfacecolor=AN_CURR_LINE_MARKERFACECOLOR, clip_on=False)
+        self.upper_nu_alfa_converged  = plt.Line2D([],[], linestyle=AN_CURR_LINE_LINESTYLE, marker=AN_CURR_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_CURR_LINE_COLOR, markerfacecolor=AN_CURR_LINE_MARKERFACECOLOR, clip_on=False)
         self.upper_nu_alfa_prescribed = plt.Line2D([],[], linestyle=AN_PRES_LINE_LINESTYLE, marker=AN_PRES_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_PRES_LINE_COLOR, markerfacecolor=AN_PRES_LINE_MARKERFACECOLOR, clip_on=False)
         self.upper_nu_alfa_modi       = plt.Line2D([],[], linestyle=AN_MODI_LINE_LINESTYLE, marker=AN_MODI_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_MODI_LINE_COLOR, clip_on=False)
 
@@ -114,7 +114,7 @@ class ProfoilCanvas:
         # during the program execution these lines will not be re-plotted.
 
         self.lower_nu_alfa_previous   = plt.Line2D([],[], linestyle=AN_PREV_LINE_LINESTYLE, marker=AN_PREV_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_PREV_LINE_COLOR, markerfacecolor=AN_PREV_LINE_MARKERFACECOLOR, clip_on=False)
-        self.lower_nu_alfa_current    = plt.Line2D([],[], linestyle=AN_CURR_LINE_LINESTYLE, marker=AN_CURR_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_CURR_LINE_COLOR, markerfacecolor=AN_CURR_LINE_MARKERFACECOLOR, clip_on=False)
+        self.lower_nu_alfa_converged  = plt.Line2D([],[], linestyle=AN_CURR_LINE_LINESTYLE, marker=AN_CURR_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_CURR_LINE_COLOR, markerfacecolor=AN_CURR_LINE_MARKERFACECOLOR, clip_on=False)
         self.lower_nu_alfa_prescribed = plt.Line2D([],[], linestyle=AN_PRES_LINE_LINESTYLE, marker=AN_PRES_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_PRES_LINE_COLOR, markerfacecolor=AN_PRES_LINE_MARKERFACECOLOR, clip_on=False)
         self.lower_nu_alfa_modi       = plt.Line2D([],[], linestyle=AN_MODI_LINE_LINESTYLE, marker=AN_MODI_LINE_MARKER, linewidth=AN_PLOT_LINEWIDTH, markersize=AN_PLOT_MARKERSIZE, color=AN_MODI_LINE_COLOR, clip_on=False)
 
@@ -232,12 +232,12 @@ class ProfoilCanvas:
         self.clear_ax(self.an_ax)
 
         self.upper_nu_alfa_previous.set_data([],[]) 
-        self.upper_nu_alfa_current.set_data([],[]) 
+        self.upper_nu_alfa_converged.set_data([],[]) 
         self.upper_nu_alfa_prescribed.set_data([],[])
         self.upper_nu_alfa_modi.set_data([],[])
 
         self.lower_nu_alfa_previous.set_data([],[]) 
-        self.lower_nu_alfa_current.set_data([],[]) 
+        self.lower_nu_alfa_converged.set_data([],[]) 
         self.lower_nu_alfa_prescribed.set_data([],[])
         self.lower_nu_alfa_modi.set_data([],[])
 
@@ -328,7 +328,7 @@ class ProfoilCanvas:
             # ax.lines = [..] wouldn't work the same way
 
             self.an_ax.add_line(self.upper_nu_alfa_previous)
-            self.an_ax.add_line(self.upper_nu_alfa_current)
+            self.an_ax.add_line(self.upper_nu_alfa_converged)
             self.an_ax.add_line(self.upper_nu_alfa_prescribed)
             self.an_ax.add_line(self.upper_nu_alfa_modi)
 
@@ -353,7 +353,7 @@ class ProfoilCanvas:
             # ax.lines = [..] wouldn't work the same way
 
             self.an_ax.add_line(self.lower_nu_alfa_previous)
-            self.an_ax.add_line(self.lower_nu_alfa_current)
+            self.an_ax.add_line(self.lower_nu_alfa_converged)
             self.an_ax.add_line(self.lower_nu_alfa_prescribed)
             self.an_ax.add_line(self.lower_nu_alfa_modi)
 
@@ -471,8 +471,8 @@ class ProfoilCanvas:
         self.reset_toolbar()
         if not self.ready_to_interact: return
         self.cancel_cursor_inputs()
-        self.upper_nu_alfa_modi.set_data(*self.upper_nu_alfa_current.get_data())
-        self.lower_nu_alfa_modi.set_data(*self.lower_nu_alfa_current.get_data())
+        self.upper_nu_alfa_modi.set_data(*self.upper_nu_alfa_prescribed.get_data())
+        self.lower_nu_alfa_modi.set_data(*self.lower_nu_alfa_prescribed.get_data())
         self.save_edits_to_file()
         self.gui_fig.canvas.draw()
 
@@ -617,8 +617,8 @@ class ProfoilCanvas:
         """
         data from "current" plot sets data on "previous" plot
         """
-        self.upper_nu_alfa_previous.set_data(*self.upper_nu_alfa_current.get_data())
-        self.lower_nu_alfa_previous.set_data(*self.lower_nu_alfa_current.get_data())
+        self.upper_nu_alfa_previous.set_data(*self.upper_nu_alfa_prescribed.get_data())
+        self.lower_nu_alfa_previous.set_data(*self.lower_nu_alfa_prescribed.get_data())
 
     def clear_ax(self, ax):
         """
@@ -640,13 +640,13 @@ class ProfoilCanvas:
         The state of these 8 lines will be maintained with the same ID by changing 
         the data these lines hold. This method vastly eases off the surface switching.
         """
-        self.upper_nu_alfa_prescribed.set_data(*self.upper_nu_alfa_modi.get_data())
+        self.upper_nu_alfa_prescribed.set_data(self.nu_upper, self.alfa_upper)
         self.upper_nu_alfa_modi.set_data(self.nu_upper, self.alfa_upper)
-        self.upper_nu_alfa_current.set_data(self.nu_upper, self.alfa_upper)
+        self.upper_nu_alfa_converged.set_data(self.nu_conv_upper, self.alfa_conv_upper)
 
-        self.lower_nu_alfa_prescribed.set_data(*self.lower_nu_alfa_modi.get_data())
+        self.lower_nu_alfa_prescribed.set_data(self.nu_lower, self.alfa_lower)
         self.lower_nu_alfa_modi.set_data(self.nu_lower, self.alfa_lower)
-        self.lower_nu_alfa_current.set_data(self.nu_lower, self.alfa_lower)
+        self.lower_nu_alfa_converged.set_data(self.nu_conv_lower, self.alfa_conv_lower)
 
     def overlay_dat(self, filename, skiprows):
         """
@@ -713,7 +713,11 @@ class ProfoilCanvas:
         self.alfa_upper,       \
         self.nu_lower,         \
         self.alfa_lower,       \
-        self.ile = p_intf.extract_all_data()
+        self.ile,              \
+        self.nu_conv_upper,    \
+        self.alfa_conv_upper,  \
+        self.nu_conv_lower,    \
+        self.alfa_conv_lower = p_intf.extract_all_data()
        
     def run_from_profoil_in(self):
         """
