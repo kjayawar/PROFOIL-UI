@@ -26,7 +26,7 @@ IFTP1_dict = {
 	100 : "K_S (trailing edge thickness parameter)",
 	101 : "c_m0",
 	102 : "t/c_max",
-	103 : "alfa_0 (rarely used)",
+	103 : "alpha_0 (rarely used)",
 	104 : "xc_max location of maximum thickness",
 	105 : "maximum camber",
 	106 : "leading edge radius",
@@ -80,7 +80,7 @@ IFTP2_dict = {
 	203 : "n(s)_Drela when AoA is segment alpha*",
 	204 : "H_32(s) when AoA is segment alpha*",
 	205 : "C_f(s) when AoA is segment alpha*",
-	300 : "H_32(s) for given Re(R1) and alfa(R2) --[allows for iteration on alpha*]",
+	300 : "H_32(s) for given Re(R1) and alpha(R2) --[allows for iteration on alpha*]",
 	500 : "Bubble ramp"
 }
 
@@ -156,27 +156,27 @@ LLBE_dict = {
 
 # ======================================= NEWT1.. Descriptions =======================================
 NEWT1G0_description = """
-# Specify {} => {}; 
+# Specify {} => {} 
 # By iterating on {}.
 {}{}"""
 
 NEWT1G1_description = """
-# Specify {} => {} @ {}; 
+# Specify {} => {} @ {} 
 # By iterating on {}.
 {}{}"""
 
 NEWT1S0_description = """
-# Specify {} at the {} {} => {}; 
+# Specify {} at the {} {} => {} 
 # By iterating on {}.
 {}{}"""
 
 NEWT1S1_description = """
-# Specify {} => {} at the {} {} for Re={};
+# Specify {} => {} at the {} {} for Re={}
 # By iterating on {}.
 {}{}"""
 
 NEWT1S2_description = """
-# Specify {} => {} at the {} {} @ AoA of {} degrees and Re={}; 
+# Specify {} => {} at the {} {} @ AoA of {} degrees and Re={} 
 # By iterating on {}.
 {}{}"""
 
@@ -200,7 +200,7 @@ NEWT2SD2_description = """
 # Specify {}
 # By iterating DELV segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
-# Specs are {} for given Re = {} and alfa = {}
+# Specs are {} for given Re = {} and alpha = {}
 {}{}"""
 
 # ======================================= NEWT1.. Named tuples =======================================

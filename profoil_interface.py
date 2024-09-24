@@ -315,7 +315,8 @@ def extract_summary(filename=WORKDIR/"profoil.log"):
     """
     text = open(filename).read()
     stats = re.findall(r'\*+\s*STATISTICS\s*\*+\n((?:.*\n){14})', text)[0]
-    airfoil_name = re.findall("Airfoil Name:(.*)|$", text)[0].strip()
+    airfoil_name_match = re.findall(r"(?:Airfoil Name:|Airfoil/Comment:)\s*(.*)", text)
+    airfoil_name = airfoil_name_match[0].strip() if airfoil_name_match else "Unnamed Airfoil"
     
     # Strip spaces from each line of stats
     stripped_stats = "\n".join(line.strip() for line in stats.splitlines())

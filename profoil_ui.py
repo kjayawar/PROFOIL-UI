@@ -97,7 +97,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.actionSave.triggered.connect(self.menu_file_save)
         self.actionProfoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=0))
         self.actionXFoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=1))
-        # self.actionMSES_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=2))
         self.actionClear_Overlay.triggered.connect(self.clear_overlay)
 
         # CheckBox Events (History and Grid)
