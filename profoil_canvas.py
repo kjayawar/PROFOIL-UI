@@ -198,26 +198,27 @@ class ProfoilCanvas:
         y_range = (x_range/ax.get_aspect()) * pixel_AR
         ax.set_ylim(y_lower, y_lower+y_range)
 
+    def setup_ax_limit(self, ax, x_lower, x_upper, y_lower):
+        """
+        setup single subplot ax limits
+        """
+        ax.set_xlim(x_lower, x_upper)
+        self.update_ylim(ax, y_lower)
+
     def setup_axes_limits(self):
         """
         initializes the axes limits
         """
-        self.ue_ax.set_xlim(-0.08, 1.08)
-        self.update_ylim(self.ue_ax, y_lower=0)
-        # self.ue_ax.set_ylim(0, 2.32)
-
-        self.xy_ax.set_xlim(-0.08, 1.08)
-        self.update_ylim(self.xy_ax, y_lower=-0.15)
+        self.setup_ax_limit(self.ue_ax, -0.08, 1.08, y_lower=0)
+        self.setup_ax_limit(self.xy_ax, -0.08, 1.08, y_lower=-0.15)
 
         if self.active_surface == "Lower":
-            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_LOWER)
-            self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
+            self.setup_ax_limit(self.an_ax, *AN_PLOT_XLIMITS_LOWER, y_lower=AN_PLOT_YLIMITS[0])
             if AN_FLIP_YAXIS_LOWER_SURFACE : 
                 self.an_ax.invert_yaxis()
 
         if self.active_surface == "Upper":
-            self.an_ax.set_xlim(*AN_PLOT_XLIMITS_UPPER)
-            self.update_ylim(self.an_ax, y_lower=AN_PLOT_YLIMITS[0])
+            self.setup_ax_limit(self.an_ax, *AN_PLOT_XLIMITS_UPPER, y_lower=AN_PLOT_YLIMITS[0])
 
     def clear_axes(self):
         """

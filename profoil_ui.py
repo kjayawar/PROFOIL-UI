@@ -149,7 +149,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
 #============================================= DIALOGS ==============================================
-    def message_box_without_sound(self, title, text):
+    def message_box_without_beep(self, title, text):
         """ pops a Message box with given title and text, without beep """
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(title)
@@ -162,11 +162,11 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
     def failure_error_dialog(self):
         """ pops a Message box with convergence failure warning, without beep """
-        self.message_box_without_sound(title="Error...", text="Design Failed - Please check the .in File")
+        self.message_box_without_beep(title="Error...", text="Design Failed - Please check the .in File")
 
     def overlay_error_dialog(self):
         """ pops a Message box with file loading error, without beep """
-        self.message_box_without_sound(title="File loading Error...", text="Please check the .dat File")
+        self.message_box_without_beep(title="File loading Error...", text="Please check the .dat File")
 
     def menu_about_profoil(self):
         """ pops a Message box with PROFOIL version info """
@@ -174,11 +174,11 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             text = open(WORKDIR/"version.txt").read()
         except:
             text = "Version info not available"
-        self.message_box_without_sound(title="PROFOIL Version", text=text)
+        self.message_box_without_beep(title="PROFOIL Version", text=text)
 
     def menu_about_profoil_ui(self):
         """ pops a Message box with PROFOIL_UI version info """
-        self.message_box_without_sound(title="PROFOIL_UI Version", text="Version 1.4 September 2024 / MIT License")
+        self.message_box_without_beep(title="PROFOIL_UI Version", text="Version 1.4 September 2024 / MIT License")
 
     def loading_warning_dialog(self):
         """ pops a Message box with file loading error. """
@@ -426,6 +426,8 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         else:
             self.select_surface("Lower", initial_plot=True)
 
+        # Explicit Ue axis limit setup--useful when KEEP_OLD_AIRFOIL_UPON_LOADING is True.
+        self.setup_ax_limit(self.ue_ax, -0.08, 1.08, y_lower=0)
         self.gui_fig.canvas.draw()
 
     def run_from_profoil_in(self):
