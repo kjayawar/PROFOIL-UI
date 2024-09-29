@@ -83,14 +83,17 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.actionProfoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=0))
         self.actionXFoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=1))
         self.actionClear_Overlay.triggered.connect(self.clear_overlay)
+        self.actionPROFOIL.triggered.connect(self.menu_about_profoil)
+        self.actionPROFOIL_UI.triggered.connect(self.menu_about_profoil_ui)
 
         # CheckBox Events (History and Grid)
         self.checkBox_grid.stateChanged.connect(self.toggle_grid_lines)
         self.checkBox_airfoil_grid.stateChanged.connect(self.toggle_airfoil_grid_lines)
         self.checkBox_history.stateChanged.connect(self.toggle_previous_plots)
 
-        # Dropdown Events (Upper / Lower Surface Switch)
-        self.combo_switch_surface.currentIndexChanged.connect(self.switch_surface)
+        # Radio button Events (Upper / Lower Surface Switch)
+        self.radio_upper_surface.toggled.connect(lambda: self.select_surface("Upper"))
+        self.radio_lower_surface.toggled.connect(lambda: self.select_surface("Lower"))
 
         # Apply the syntax highlighter to the profoil.in text editor
         self.highlighter = CommentHighlighter(self.plainTextEdit_profoil_in.document())
@@ -146,27 +149,36 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
 #============================================= DIALOGS ==============================================
-    def failure_error_dialog(self):
-        """ pops a Message box with convergence failure warning, without beep """
+    def message_box_without_sound(self, title, text):
+        """ pops a Message box with given title and text, without beep """
         msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("Error...")
-        msg_box.setText("Design Failed - Please check the .in File")
+        msg_box.setWindowTitle(title)
+        msg_box.setText(text)
         
         # Setting icon to avoid beep
         msg_box.setIcon(QMessageBox.NoIcon)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.exec_()
 
+    def failure_error_dialog(self):
+        """ pops a Message box with convergence failure warning, without beep """
+        self.message_box_without_sound(title="Error...", text="Design Failed - Please check the .in File")
+
     def overlay_error_dialog(self):
         """ pops a Message box with file loading error, without beep """
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("File loading Error...")
-        msg_box.setText("Please check the .dat File")
-        
-        # Setting icon to avoid beep
-        msg_box.setIcon(QMessageBox.NoIcon)
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.exec_()
+        self.message_box_without_sound(title="File loading Error...", text="Please check the .dat File")
+
+    def menu_about_profoil(self):
+        """ pops a Message box with PROFOIL version info """
+        try:
+            text = open(WORKDIR/"version.txt").read()
+        except:
+            text = "Version info not available"
+        self.message_box_without_sound(title="PROFOIL Version", text=text)
+
+    def menu_about_profoil_ui(self):
+        """ pops a Message box with PROFOIL_UI version info """
+        self.message_box_without_sound(title="PROFOIL_UI Version", text="Version 1.4 September 2024 / MIT License")
 
     def loading_warning_dialog(self):
         """ pops a Message box with file loading error. """
@@ -183,12 +195,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         by changing the color of the "Save" button
         """
         self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
-
-    def switch_surface(self, event):
-        """
-        Switching the surface through the combo box.
-        """
-        self.select_surface(self.combo_switch_surface.itemText(event))
 
     def save_planTextEdit_to_profoil(self):
         """
@@ -207,8 +213,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         if self.ready_to_interact:
             if self.loading_warning_dialog() != QMessageBox.Yes:
                 return
-            # select "Upper" surface
-            self.combo_switch_surface.setCurrentIndex(0)
             if KEEP_OLD_AIRFOIL_UPON_LOADING:
                 self.bkp_previous_line()    
 
@@ -415,7 +419,12 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
         p_intf.save2profoil_in(Path(in_file).open().read())
         self.run_from_profoil_in()
-        self.select_surface("Upper", initial_plot =True)
+
+        # Keep the current state of the surface selection
+        if self.radio_upper_surface.isChecked():
+            self.select_surface("Upper", initial_plot=True)
+        else:
+            self.select_surface("Lower", initial_plot=True)
 
         self.gui_fig.canvas.draw()
 
