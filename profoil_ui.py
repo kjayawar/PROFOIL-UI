@@ -37,6 +37,11 @@ from preferences import *
 from annotate import annotate_text
 
 import profoil_interface as p_intf
+from profoil_interface import WORKDIR, BINDIR
+from pathlib import Path
+
+from scipy.interpolate import interp1d
+import numpy as np
 
 class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
     def __init__(self):
@@ -56,27 +61,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # Replace the home method in the toolbar with the patched version
         NavigationToolbar.home = patched_home
 
-    def load_canvas(self):
-        """
-        creates FigureCanvas from matplotlib Figure and loads into PyQt Widget space
-        """
-        self.canvas = FigureCanvas(self.gui_fig)
-        self.verticalLayout_canvas.addWidget(self.canvas)
-
-        self.tool_bar = self.gen_toolbar()
-        self.verticalLayout_canvas.addWidget(self.tool_bar)
-
-    def gen_toolbar(self):
-        """
-        creates a custom tool bar without unnecessary buttons to minimize confusion
-        """
-        tool_bar = NavigationToolbar(self.canvas, self)
-        selected_buttons = ['Home', 'Pan','Zoom','Save']
-        for x in tool_bar.actions():
-            if x.text() not in selected_buttons:
-                tool_bar.removeAction(x)
-        return tool_bar
-
+#========================================== EVENT TRIGGERS ==========================================
     def connect_widget_events(self):
         """
         maps button/menu/combo_box and tab signals to functions
@@ -160,19 +145,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.annotate_shortcut = QShortcut(QKeySequence(SHORTCUT_ANNOTATE), self)
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
-    def on_profoil_in_text_changed(self):
-        """
-        Indicates there are some unsaved changes in the profoil.in file
-        by changing the color of the "Save" button
-        """
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
-
-    def switch_surface(self, event):
-        """
-        Switching the surface through the combo box.
-        """
-        self.select_surface(self.combo_switch_surface.itemText(event))
-
+#============================================= DIALOGS ==============================================
     def failure_error_dialog(self):
         """ pops a Message box with convergence failure warning, without beep """
         msg_box = QMessageBox(self)
@@ -203,6 +176,20 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             "Any unsaved data will be lost.\n          Continue?          ",
             QMessageBox.Yes | QMessageBox.Cancel) if AIRFOIL_CHANGE_WARNING else QMessageBox.Yes
 
+#======================================== CALLBACK FUNCTIONS ========================================
+    def on_profoil_in_text_changed(self):
+        """
+        Indicates there are some unsaved changes in the profoil.in file
+        by changing the color of the "Save" button
+        """
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
+
+    def switch_surface(self, event):
+        """
+        Switching the surface through the combo box.
+        """
+        self.select_surface(self.combo_switch_surface.itemText(event))
+
     def save_planTextEdit_to_profoil(self):
         """
         saves the profoil.in file view, in to the profoil.in file.
@@ -222,10 +209,133 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
                 return
             # select "Upper" surface
             self.combo_switch_surface.setCurrentIndex(0)
+            if KEEP_OLD_AIRFOIL_UPON_LOADING:
+                self.bkp_previous_line()    
 
         filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
         if filename:
             self.load_in_file(filename)
+
+    def start_cursor_edits(self, event=None):
+        self.reset_toolbar()
+        self.edit_mode = not self.edit_mode
+        self.btn_start_edits.setStyleSheet('QPushButton {color: red;}' if self.edit_mode else 'QPushButton {color: black;}')
+        if self.edit_mode:
+            self.canvas.setCursor(QtCore.Qt.CrossCursor)  # Keep crosshair during edit mode
+        else:
+            self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor when exiting edit mode
+            self.cancel_cursor_inputs()
+
+    def set_edit_mode_off(self):
+        self.edit_mode = False
+        self.btn_start_edits.setStyleSheet('QPushButton {color: black;}')
+
+    def cancel_cursor_inputs(self, event=None):
+        """
+        Resets the cursor edit line in to an empty line.
+        Simple means to start over with a new cursor edit line.
+        """
+        self.reset_toolbar()
+        if not self.ready_to_interact: return
+        self.cursor_edit_line.set_data([],[])
+        self.cursor_edit_line_points = self.cursor_edit_line.get_xydata().tolist()
+        self.set_edit_mode_off()
+        self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor on the canvas
+        self.gui_fig.canvas.draw()
+
+    def apply_edits(self, event=None):
+        """
+        Cursor edits are applied to the green line from the red line
+        """
+        self.reset_toolbar()
+        # Better protection than if self.cursor_edit_line_points because one point cannot make spline 
+        if len(self.cursor_edit_line_points)>1: 
+            self.set_edit_mode_off()
+            x_data, y_data = self.nu_alfa.get_data()
+            spline = interp1d(*np.array(self.cursor_edit_line_points).T, 
+                               kind='linear', 
+                               bounds_error=False)
+            new_y = spline(x_data)
+            self.nu_alfa.set_ydata(np.where(np.isnan(new_y), y_data, new_y))
+        self.save_edits_to_file()
+        self.cancel_cursor_inputs()
+        self.canvas.setCursor(QtCore.Qt.ArrowCursor) # Reset to default cursor on the canvas
+
+    def save_edits_to_file(self):
+        """
+        Saves green line data in to the profoil.in file
+        """
+        nu_upper, alfa_upper = self.upper_nu_alfa_modi.get_data()
+        nu_lower, alfa_lower = self.lower_nu_alfa_modi.get_data()
+        nu_list = list(nu_upper) + list(nu_lower)
+        alfa_list = list(alfa_upper) + list(alfa_lower)
+        p_intf.gen_buffer()
+        p_intf.gen_input_file(nu_list, alfa_list, len(nu_upper))
+
+    def undo_edits(self, event=None):
+        """
+        This callback function resets the modifiable phi-alpha* distribution
+        back to the current converged data from the most recent run. 
+        Typically used when the line edits
+        has to be reverted.
+        """
+        self.reset_toolbar()
+        if not self.ready_to_interact: return
+        self.cancel_cursor_inputs()
+        self.upper_nu_alfa_modi.set_data(*self.upper_nu_alfa_prescribed.get_data())
+        self.lower_nu_alfa_modi.set_data(*self.lower_nu_alfa_prescribed.get_data())
+        self.save_edits_to_file()
+        self.gui_fig.canvas.draw()
+
+    def plot_from_file(self, event=None):
+        """
+        Reads profoil.in file in the work directory and updates the green line
+        This action confirms any manual modifications if applicable
+        """
+        self.reset_toolbar()
+        nu, alfa, ile, phis = p_intf.extract_dmp(WORKDIR/"profoil.in")
+
+        nu_upper = nu[:ile]
+        alfa_upper = alfa[:ile]
+
+        nu_lower = nu[ile:]
+        alfa_lower = alfa[ile:]
+
+        self.upper_nu_alfa_modi.set_data(nu_upper,alfa_upper)
+        self.lower_nu_alfa_modi.set_data(nu_lower,alfa_lower)
+        self.gui_fig.canvas.draw()
+
+    def run_profoil(self, event=None):
+        """
+        Executes PROFOIL with the following steps.
+        1. Backup the previous line.    # For reloading as required
+        2. Resets the cursor edit line. # Because after the run cursor edit line should not be there.
+        3. Creates buffer.in from the existing profoil.in file.
+        4. Creates a new profoil.in file by replacing the FOIL lines with the data in the graph.
+        5. Prints out the profoil.log file.
+        """
+        if not self.ready_to_interact: return
+        self.reset_toolbar()
+        self.set_edit_mode_off()
+        self.bkp_previous_line()
+        self.cancel_cursor_inputs()
+        self.run_from_profoil_in()
+        self.gui_fig.canvas.draw()
+
+    def revert(self, event=None):
+        """
+        This callback function loads the converged data from the previous run
+        typically used when something goes wrong with the current run.
+        Equivalent to loading buffer.in instead of profoil.in in the work dir.
+        """
+        self.reset_toolbar()
+        if not self.ready_to_interact: return
+        if not self.upper_nu_alfa_previous.get_data()[0]: return
+        self.set_edit_mode_off()
+        self.cancel_cursor_inputs()
+        p_intf.swap_buffer()
+        self.run_profoil()
+        self.gui_fig.canvas.draw()
 
     def menu_file_save(self):
         """
@@ -258,6 +368,125 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
             modified_lines = [line[1:] if line.startswith(("#","!")) else COMMENT_MARKER+line for line in selected_lines]
             cursor.insertText("\n".join(modified_lines))
+
+    def save_airfoil(self, out_file):
+        """
+        Saves the profoil.in file from the WORKDIR in to a specified location with a given name.
+        For the ease of use, if the given path does not exist, the program creates the path for you. 
+        """
+        file_path = Path(out_file)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open("w") as f:
+            f.write(Path(WORKDIR/"profoil.in").open().read())
+
+#======================================== UTILITY FUNCTIONS =========================================
+    def load_canvas(self):
+        """
+        creates FigureCanvas from matplotlib Figure and loads into PyQt Widget space
+        """
+        self.canvas = FigureCanvas(self.gui_fig)
+        self.verticalLayout_canvas.addWidget(self.canvas)
+
+        self.tool_bar = self.gen_toolbar()
+        self.verticalLayout_canvas.addWidget(self.tool_bar)
+
+    def gen_toolbar(self):
+        """
+        creates a custom tool bar without unnecessary buttons to minimize confusion
+        """
+        tool_bar = NavigationToolbar(self.canvas, self)
+        selected_buttons = ['Home', 'Pan','Zoom','Save']
+        for x in tool_bar.actions():
+            if x.text() not in selected_buttons:
+                tool_bar.removeAction(x)
+        return tool_bar
+
+    def load_in_file(self, in_file=None):
+        """
+        Loads a *.in file in to the program.
+        1. Sets the ready_to_interact flag to make sure no errors will occur by pressing a random button. 
+        2. copies *.in file in to WORKDIR as profoil.in
+        3. Runs PROFOIL
+        """
+        self.ready_to_interact = True
+        if not KEEP_OLD_AIRFOIL_UPON_LOADING:
+            self.setup_axes_limits()
+            self.clear_axes()
+
+        p_intf.save2profoil_in(Path(in_file).open().read())
+        self.run_from_profoil_in()
+        self.select_surface("Upper", initial_plot =True)
+
+        self.gui_fig.canvas.draw()
+
+    def run_from_profoil_in(self):
+        """
+        Executes PROFOIL when the profoil.in file is ready in the WORKDIR
+        """
+        # execute profoil
+        p_intf.exec_profoil()
+
+        # profoil run may or may not have been successful.
+        # either way, file view has to be updated.
+        # conditional logic follows for the graphics
+
+        self.update_file_view()
+        self.update_converged_view()
+        
+        if p_intf.is_design_converged():
+            self.extract_all_profoil_data()
+            self.update_summary_text()
+            self.plot_ue()
+            self.plot_xy()
+            self.plot_nu_alfa()
+        else:
+            self.failure_error_dialog()
+
+    def extract_all_profoil_data(self):
+        """
+        Once the PROFOIL is finished running, the data will be in the WORKDIR.
+        This functions updates all the relevant fields in the UI
+        from the PROFOIL output files in one go
+        """
+        self.x,                \
+        self.y,                \
+        self.xy_marker_upper,  \
+        self.xy_marker_lower,  \
+        self.ue_lines,         \
+        self.upper_vel_markers,\
+        self.lower_vel_markers,\
+        self.nu_upper,         \
+        self.alfa_upper,       \
+        self.nu_lower,         \
+        self.alfa_lower,       \
+        self.ile,              \
+        self.nu_conv_upper,    \
+        self.alfa_conv_upper,  \
+        self.nu_conv_lower,    \
+        self.alfa_conv_lower = p_intf.extract_all_data()
+
+    def update_file_view(self):
+        """
+        Updates the text boxes in the File View tab
+        """
+        self.plainTextEdit_profoil_log.setPlainText(p_intf.catfile(WORKDIR/"profoil.log", tail=0))
+        self.plainTextEdit_profoil_in.setPlainText(p_intf.catfile(WORKDIR/"profoil.in", tail=0))
+
+        # upon updating  plainTextEdit_profoil_in change the save button color back to black
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
+
+    def update_converged_view(self):
+        """
+        Updates the text boxes in the File View tab
+        """
+        self.plainTextEdit_profoil_dmp.setPlainText(p_intf.catfile(WORKDIR/"profoil.dmp", tail=0))
+        self.plainTextEdit_profoil_xy.setPlainText(p_intf.catfile(WORKDIR/"profoil.xy", tail=0))
+
+    def update_summary_text(self):
+        """
+        updates the summary label in the design view
+        """
+        self.lbl_summary.setText(p_intf.extract_summary(WORKDIR/"profoil.log"))
 
     def annotate_profoil_in(self):
         """

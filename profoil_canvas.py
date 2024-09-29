@@ -71,11 +71,10 @@
 
 import numpy as np
 from pathlib import Path
-from scipy.interpolate import interp1d
 
 from preferences import *
 import profoil_interface as p_intf
-from profoil_interface import WORKDIR
+from profoil_interface import WORKDIR, BINDIR
 
 import matplotlib
 matplotlib.use('Qt5Agg', force=True)
@@ -93,6 +92,7 @@ class ProfoilCanvas:
         self.SHOW_PREV_LINES          = True  # Show previous plots on the Velocity and x,y plots.
         
         self.active_surface = "Upper"
+        self.n_held_history_lines = 0
 
         self.upper_xlim =AN_PLOT_XLIMITS_UPPER
         self.upper_ylim =AN_PLOT_YLIMITS
@@ -223,23 +223,19 @@ class ProfoilCanvas:
         """
         clears all axes data such that new session with new airfoil can be loaded.
         """
-        
-        # bug fix -- 26/Jul/2024
-        # https://www.rcgroups.com/forums/showpost.php?p=52749409&postcount=110
-
         self.clear_ax(self.ue_ax)
         self.clear_ax(self.xy_ax)
         self.clear_ax(self.an_ax)
 
-        self.upper_nu_alfa_previous.set_data([],[]) 
         self.upper_nu_alfa_converged.set_data([],[]) 
         self.upper_nu_alfa_prescribed.set_data([],[])
         self.upper_nu_alfa_modi.set_data([],[])
+        self.upper_nu_alfa_previous.set_data([],[])
 
-        self.lower_nu_alfa_previous.set_data([],[]) 
         self.lower_nu_alfa_converged.set_data([],[]) 
         self.lower_nu_alfa_prescribed.set_data([],[])
         self.lower_nu_alfa_modi.set_data([],[])
+        self.lower_nu_alfa_previous.set_data([],[])
 
         self.cursor_edit_line.set_data([],[])
 
@@ -264,7 +260,6 @@ class ProfoilCanvas:
         self.nu_alfa_points = self.nu_alfa.get_xydata().tolist()
         self.gui_fig.canvas.draw()
 
-            
     def on_click(self, event=None):
         """
         All the mouse click events go here
@@ -303,7 +298,7 @@ class ProfoilCanvas:
             self.upper_xlim = self.an_ax.get_xlim()
             self.upper_ylim = self.an_ax.get_ylim()
 
-    def select_surface(self, surface, first_time=False):
+    def select_surface(self, surface, initial_plot=False):
         """
         Callback function that switches the upper and lower surfaces
         through the radio buttons.
@@ -314,7 +309,7 @@ class ProfoilCanvas:
         self.clear_ax(self.an_ax)
         if surface =="Upper":
             # backup zoomed limits if applicable.
-            if not first_time:
+            if not initial_plot:
                 self.backup_zoomed_limits(surface)
             self.active_surface = "Upper"
 
@@ -339,7 +334,7 @@ class ProfoilCanvas:
 
         if surface =="Lower":
             # backup zoomed limits if applicable.
-            if not first_time:
+            if not initial_plot:
                 self.backup_zoomed_limits(surface)
             self.active_surface = "Lower"
 
@@ -394,6 +389,10 @@ class ProfoilCanvas:
                 line.set_visible(self.SHOW_PREV_LINES)
             for marker in ax.preserved_markers:
                 marker.set_visible(self.SHOW_PREV_LINES)
+
+        self.upper_nu_alfa_previous.set_visible(self.SHOW_PREV_LINES)
+        self.lower_nu_alfa_previous.set_visible(self.SHOW_PREV_LINES)
+
         self.gui_fig.canvas.draw()
 
     def toggle_grid_lines(self, event=None):
@@ -403,127 +402,6 @@ class ProfoilCanvas:
         """
         self.GRID_ON = bool(event)
         self.an_ax.grid(self.GRID_ON)
-        self.gui_fig.canvas.draw()
-
-    def set_edit_mode_off(self):
-        self.edit_mode = False
-        self.btn_start_edits.setStyleSheet('QPushButton {color: black;}')
-
-    def start_cursor_edits(self, event=None):
-        self.reset_toolbar()
-        self.edit_mode = not self.edit_mode
-        self.btn_start_edits.setStyleSheet('QPushButton {color: red;}' if self.edit_mode else 'QPushButton {color: black;}')
-        if self.edit_mode:
-            self.canvas.setCursor(QtCore.Qt.CrossCursor)  # Keep crosshair during edit mode
-        else:
-            self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor when exiting edit mode
-            self.cancel_cursor_inputs()
-
-    def cancel_cursor_inputs(self, event=None):
-        """
-        Resets the cursor edit line in to an empty line.
-        Simple means to start over with a new cursor edit line.
-        """
-        self.reset_toolbar()
-        if not self.ready_to_interact: return
-        self.cursor_edit_line.set_data([],[])
-        self.cursor_edit_line_points = self.cursor_edit_line.get_xydata().tolist()
-        self.set_edit_mode_off()
-        self.canvas.setCursor(QtCore.Qt.ArrowCursor)  # Reset to default cursor on the canvas
-        self.gui_fig.canvas.draw()
-
-    def apply_edits(self, event=None):
-        """
-        Cursor edits are applied to the green line from the red line
-        """
-        self.reset_toolbar()
-        # Better protection than if self.cursor_edit_line_points because one point cannot make spline 
-        if len(self.cursor_edit_line_points)>1: 
-            self.set_edit_mode_off()
-            x_data, y_data = self.nu_alfa.get_data()
-            spline = interp1d(*np.array(self.cursor_edit_line_points).T, 
-                               kind='linear', 
-                               bounds_error=False)
-            new_y = spline(x_data)
-            self.nu_alfa.set_ydata(np.where(np.isnan(new_y), y_data, new_y))
-        self.save_edits_to_file()
-        self.cancel_cursor_inputs()
-        self.canvas.setCursor(QtCore.Qt.ArrowCursor) # Reset to default cursor on the canvas
-
-    def save_edits_to_file(self):
-        """
-        Saves green line data in to the profoil.in file
-        """
-        nu_upper, alfa_upper = self.upper_nu_alfa_modi.get_data()
-        nu_lower, alfa_lower = self.lower_nu_alfa_modi.get_data()
-        nu_list = list(nu_upper) + list(nu_lower)
-        alfa_list = list(alfa_upper) + list(alfa_lower)
-        p_intf.gen_buffer()
-        p_intf.gen_input_file(nu_list, alfa_list, len(nu_upper))
-
-    def undo_edits(self, event=None):
-        """
-        This callback function resets the modifiable phi-alpha* distribution
-        back to the current converged data from the most recent run. 
-        Typically used when the line edits
-        has to be reverted.
-        """
-        self.reset_toolbar()
-        if not self.ready_to_interact: return
-        self.cancel_cursor_inputs()
-        self.upper_nu_alfa_modi.set_data(*self.upper_nu_alfa_prescribed.get_data())
-        self.lower_nu_alfa_modi.set_data(*self.lower_nu_alfa_prescribed.get_data())
-        self.save_edits_to_file()
-        self.gui_fig.canvas.draw()
-
-    def plot_from_file(self, event=None):
-        """
-        Reads profoil.in file in the work directory and updates the green line
-        This action confirms any manual modifications if applicable
-        """
-        self.reset_toolbar()
-        nu, alfa, ile, phis = p_intf.extract_dmp(WORKDIR/"profoil.in")
-
-        nu_upper = nu[:ile]
-        alfa_upper = alfa[:ile]
-
-        nu_lower = nu[ile:]
-        alfa_lower = alfa[ile:]
-
-        self.upper_nu_alfa_modi.set_data(nu_upper,alfa_upper)
-        self.lower_nu_alfa_modi.set_data(nu_lower,alfa_lower)
-        self.gui_fig.canvas.draw()
-
-    def run_profoil(self, event=None):
-        """
-        Executes PROFOIL with the following steps.
-        1. Backup the previous line.    # For reloading as required
-        2. Resets the cursor edit line. # Because after the run cursor edit line should not be there.
-        3. Creates buffer.in from the existing profoil.in file.
-        4. Creates a new profoil.in file by replacing the FOIL lines with the data in the graph.
-        5. Prints out the profoil.log file.
-        """
-        self.reset_toolbar()
-        if not self.ready_to_interact: return
-        self.set_edit_mode_off()
-        self.bkp_previous_line()
-        self.cancel_cursor_inputs()
-        self.run_from_profoil_in()
-        self.gui_fig.canvas.draw()
-
-    def revert(self, event=None):
-        """
-        This callback function loads the converged data from the previous run
-        typically used when something goes wrong with the current run.
-        Equivalent to loading buffer.in instead of profoil.in in the work dir.
-        """
-        self.reset_toolbar()
-        if not self.ready_to_interact: return
-        if not self.upper_nu_alfa_previous.get_data()[0]: return
-        self.set_edit_mode_off()
-        self.cancel_cursor_inputs()
-        p_intf.swap_buffer()
-        self.run_profoil()
         self.gui_fig.canvas.draw()
 
     def proc_make_ax_old(self, ax, preserve_lines=1):
@@ -594,8 +472,7 @@ class ProfoilCanvas:
         """ 
         Plots velocity distribution data
         """
-        n_cols = len(self.ue_lines.keys())
-        n_ue_preserve = n_cols * n_prev_plots # alphas give the number of lines
+        n_ue_preserve = self.n_held_history_lines * n_prev_plots # alphas give the number of lines
 
         # make the previous plots "old" [greyed out and dashed etc]
         self.proc_make_ax_old(self.ue_ax, n_ue_preserve)
@@ -606,6 +483,8 @@ class ProfoilCanvas:
             p = self.ue_ax.plot(self.ue_lines[alpha]['x'], self.ue_lines[alpha]['v_vinf'], label = "{:5.2f}".format(alpha), lw=UE_PLOT_LINEWIDTH, color=UE_PLOT_COLOR, clip_on=False)
             self.ue_ax.scatter(self.upper_vel_markers[alpha]['x'], self.upper_vel_markers[alpha]['v_vinf'], color=p[-1].get_color(), marker=UPPER_SURFACE_PHI_MARKER, s=UPPER_SURFACE_PHI_MARKER_SIZE, clip_on=False)
             self.ue_ax.scatter(self.lower_vel_markers[alpha]['x'], self.lower_vel_markers[alpha]['v_vinf'], color=p[-1].get_color(), marker=LOWER_SURFACE_PHI_MARKER, s=LOWER_SURFACE_PHI_MARKER_SIZE, clip_on=False)
+
+        self.n_held_history_lines = len(self.ue_lines.keys())
 
         # legend is not used in the current implementation because Alphas are just dummy variables.
         # can modify easily in the future if Alphas to be read from the .in file.
@@ -672,106 +551,3 @@ class ProfoilCanvas:
         self.overlay_line.set_data([],[])
         self.overlay_line.set_visible(False)
         self.gui_fig.canvas.draw()
-
-    def update_file_view(self):
-        """
-        Updates the text boxes in the File View tab
-        """
-        self.plainTextEdit_profoil_log.setPlainText(p_intf.catfile(WORKDIR/"profoil.log", tail=0))
-        self.plainTextEdit_profoil_in.setPlainText(p_intf.catfile(WORKDIR/"profoil.in", tail=0))
-
-        # upon updating  plainTextEdit_profoil_in change the save button color back to black
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black;}')
-
-    def update_converged_view(self):
-        """
-        Updates the text boxes in the File View tab
-        """
-        self.plainTextEdit_profoil_dmp.setPlainText(p_intf.catfile(WORKDIR/"profoil.dmp", tail=0))
-        self.plainTextEdit_profoil_xy.setPlainText(p_intf.catfile(WORKDIR/"profoil.xy", tail=0))
-
-    def update_summary_text(self):
-        """
-        updates the summary label in the design view
-        """
-        self.lbl_summary.setText(p_intf.extract_summary(WORKDIR/"profoil.log"))
-
-    def extract_all_profoil_data(self):
-        """
-        Once the PROFOIL is finished running, the data will be in the WORKDIR.
-        This functions updates all the relevant fields in the UI
-        from the PROFOIL output files in one go
-        """
-        self.x,                \
-        self.y,                \
-        self.xy_marker_upper,  \
-        self.xy_marker_lower,  \
-        self.ue_lines,         \
-        self.upper_vel_markers,\
-        self.lower_vel_markers,\
-        self.nu_upper,         \
-        self.alfa_upper,       \
-        self.nu_lower,         \
-        self.alfa_lower,       \
-        self.ile,              \
-        self.nu_conv_upper,    \
-        self.alfa_conv_upper,  \
-        self.nu_conv_lower,    \
-        self.alfa_conv_lower = p_intf.extract_all_data()
-       
-    def run_from_profoil_in(self):
-        """
-        Executes PROFOIL when the profoil.in file is ready in the WORKDIR
-        """
-        # execute profoil
-        p_intf.exec_profoil()
-
-        # profoil run may or may not have been successful.
-        # either way, file view has to be updated.
-        # conditional logic follows for the graphics
-
-        self.update_file_view()
-        self.update_converged_view()
-        
-        if p_intf.is_design_converged():
-            self.extract_all_profoil_data()
-            self.update_summary_text()
-            self.plot_ue()
-            self.plot_xy()
-            self.plot_nu_alfa()
-
-        else:
-            self.failure_error_dialog()
-
-    def initial_plot(self):
-        """
-        Initial plot is called once at the initial setup. 
-        Before calling initial_plot its required to have run_from_profoil_in(...) called.
-        """     
-        self.select_surface("Upper", first_time =True)
-
-    def load_in_file(self, in_file=None):
-        """
-        Loads a *.in file in to the program. Keeps on calling until a valid file is provided.
-        1. Sets the ready_to_interact flag to make sure no errors will occur by pressing a random button. 
-        2. copies *.in file in to WORKDIR as profoil.in
-        3. Runs PROFOIL
-        """
-        self.ready_to_interact = True
-        p_intf.save2profoil_in(Path(in_file).open().read())
-        self.run_from_profoil_in()
-        self.initial_plot()
-        if not KEEP_OLD_AIRFOIL_UPON_LOADING:
-            self.setup_axes_limits()
-            self.clear_axes()
-        self.gui_fig.canvas.draw()
-
-    def save_airfoil(self, out_file):
-        """
-        Saves the profoil.in file from the WORKDIR in to a specified location with a given name.
-        For the ease of use, if the given path does not exist, the program creates the path for you. 
-        """
-        file_path = Path(out_file)
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        with file_path.open("w") as f:
-            f.write(Path(WORKDIR/"profoil.in").open().read())
