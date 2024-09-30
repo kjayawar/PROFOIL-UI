@@ -148,6 +148,9 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.annotate_shortcut = QShortcut(QKeySequence(SHORTCUT_ANNOTATE), self)
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
+        # Amend shortcut names
+        self.ammend_shortcut_names()
+
 #============================================= DIALOGS ==============================================
     def message_box_without_beep(self, title, text):
         """ pops a Message box with given title and text, without beep """
@@ -517,6 +520,19 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # users should be able to undo the annotation straight away if the outcome is not satisfactory
         # hence the focus is set on the plainTextEdit_profoil_in
         self.plainTextEdit_profoil_in.setFocus()
+
+    def ammend_shortcut_names(self):
+        """
+        Append menu items and button names with the shortcuts given in the preferences.py
+        menu items has to be fixed length for better visual appeal
+        """
+        self.actionOpen.setText(f"{self.actionOpen.text().ljust(15-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
+        self.actionSave.setText(f"{self.actionSave.text().ljust(15-len(SHORTCUT_SAVE))}({SHORTCUT_SAVE})")
+        
+        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_EDIT})")
+        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_EXEC})")
+        self.btn_save_profoil_in.setText(f"{self.btn_save_profoil_in.text()} ({SHORTCUT_SAVE})")
+        self.btn_annotate.setText(f"{self.btn_annotate.text()} ({SHORTCUT_ANNOTATE})")
 
 if __name__ == "__main__":
     import sys

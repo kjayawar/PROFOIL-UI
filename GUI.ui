@@ -128,7 +128,7 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Start Edits (Ctrl+E)</string>
+             <string>Start Edits</string>
             </property>
            </widget>
           </item>
@@ -225,7 +225,7 @@
              <string notr="true">background-color:yellowgreen;</string>
             </property>
             <property name="text">
-             <string>Run PROFOIL (Ctrl+R)</string>
+             <string>Run PROFOIL</string>
             </property>
            </widget>
           </item>
@@ -423,14 +423,14 @@
           <item>
            <widget class="QPushButton" name="btn_annotate">
             <property name="text">
-             <string>Annotate (Ctrl+A)</string>
+             <string>Annotate</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btn_save_profoil_in">
             <property name="text">
-             <string>Save (Ctrl+S)</string>
+             <string>Save</string>
             </property>
            </widget>
           </item>
@@ -545,12 +545,12 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">
-    <string>Open    (Ctrl+O)</string>
+    <string>Open</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save As (Ctrl+S)</string>
+    <string>Save As</string>
    </property>
   </action>
   <action name="actionProfoil_dat_File">
