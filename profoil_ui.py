@@ -429,8 +429,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         else:
             self.select_surface("Lower", initial_plot=True)
 
-        # Explicit Ue axis limit setup--useful when KEEP_OLD_AIRFOIL_UPON_LOADING is True.
-        self.setup_ax_limit(self.ue_ax, -0.08, 1.08, y_lower=0)
         self.gui_fig.canvas.draw()
 
     def run_from_profoil_in(self):
