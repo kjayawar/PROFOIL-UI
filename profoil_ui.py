@@ -527,8 +527,9 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         Append menu items and button names with the shortcuts given in the preferences.py
         menu items has to be fixed length for better visual appeal
         """
-        self.actionOpen.setText(f"{self.actionOpen.text().ljust(15-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
-        self.actionSave.setText(f"{self.actionSave.text().ljust(15-len(SHORTCUT_SAVE))}({SHORTCUT_SAVE})")
+        MENU_TEXT_LENGTH = 15
+        self.actionOpen.setText(f"{self.actionOpen.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
+        self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE))}({SHORTCUT_SAVE})")
         
         self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_EDIT})")
         self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_EXEC})")
