@@ -151,6 +151,9 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # Amend shortcut names
         self.ammend_shortcut_names()
 
+        # backup zoomed limits of an_ax so that upper-lower surface switching wont be affected
+        self.an_ax.figure.canvas.mpl_connect('draw_event', self.bkp_an_ax_zoomed_limits)
+
 #============================================= DIALOGS ==============================================
     def message_box_without_beep(self, title, text):
         """ pops a Message box with given title and text, without beep """
@@ -425,9 +428,9 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
         # Keep the current state of the surface selection
         if self.radio_upper_surface.isChecked():
-            self.select_surface("Upper", initial_plot=True)
+            self.select_surface("Upper")
         else:
-            self.select_surface("Lower", initial_plot=True)
+            self.select_surface("Lower")
 
         self.gui_fig.canvas.draw()
 

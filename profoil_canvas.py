@@ -287,19 +287,18 @@ class ProfoilCanvas:
 
             self.gui_fig.canvas.draw()
 
-    def backup_zoomed_limits(self, surface):
+    def bkp_an_ax_zoomed_limits(self, event):
         """
-        save zoomed limits so that switching between upper and lower surfaces cause resetting limits
+        save zoomed limits so that switching between upper and lower surfaces wont reset limits
         """
-        if surface == self.active_surface: return
-        if surface == "Upper":
+        if self.active_surface == "Lower":
             self.lower_xlim = self.an_ax.get_xlim()
             self.lower_ylim = self.an_ax.get_ylim()
-        if surface == "Lower":
+        if self.active_surface == "Upper":
             self.upper_xlim = self.an_ax.get_xlim()
             self.upper_ylim = self.an_ax.get_ylim()
 
-    def select_surface(self, surface, initial_plot=False):
+    def select_surface(self, surface):
         """
         Callback function that switches the upper and lower surfaces
         through the radio buttons.
@@ -309,9 +308,6 @@ class ProfoilCanvas:
         self.reset_toolbar()
         self.clear_ax(self.an_ax)
         if surface =="Upper":
-            # backup zoomed limits if applicable.
-            if not initial_plot:
-                self.backup_zoomed_limits(surface)
             self.active_surface = "Upper"
 
             self.an_ax.set_xlim(*self.upper_xlim)
@@ -334,9 +330,6 @@ class ProfoilCanvas:
             self.load_line(self.upper_nu_alfa_modi)
 
         if surface =="Lower":
-            # backup zoomed limits if applicable.
-            if not initial_plot:
-                self.backup_zoomed_limits(surface)
             self.active_surface = "Lower"
 
             self.an_ax.set_xlim(*self.lower_xlim)
