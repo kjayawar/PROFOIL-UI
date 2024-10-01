@@ -61,6 +61,10 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # Replace the home method in the toolbar with the patched version
         NavigationToolbar.home = patched_home
 
+        # Add a new parameter to store the last open path
+        # this will be changed upon opening a file if KEEP_LAST_OPEN_PATH_AS_DEFAULT is set
+        self.default_open_dir = '../runs'
+
 #========================================== EVENT TRIGGERS ==========================================
     def connect_widget_events(self):
         """
@@ -79,7 +83,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
 
         # Menu Events
         self.actionOpen.triggered.connect(self.menu_file_open)
-        self.actionSave.triggered.connect(self.menu_file_save)
+        self.actionSave.triggered.connect(self.menu_file_save_as)
         self.actionProfoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=0))
         self.actionXFoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=1))
         self.actionClear_Overlay.triggered.connect(self.clear_overlay)
@@ -102,7 +106,9 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
 
         # New connection for the "File | Save" button
-        self.btn_file_save.clicked.connect(self.menu_file_save)
+        self.btn_file_save.clicked.connect(self.menu_file_save_as)
+        self.save_as_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_AS), self)
+        self.save_as_shortcut.activated.connect(self.menu_file_save_as)
 
         # New connection for the "File | Open" button
         self.btn_file_open.clicked.connect(self.menu_file_open)
@@ -148,8 +154,73 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.annotate_shortcut = QShortcut(QKeySequence(SHORTCUT_ANNOTATE), self)
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
+        # Create the shortcut for "Design View" using F1
+        self.f1_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F1_DESIGN_VIEW), self)
+        self.f1_design_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(0))
+        
+        # Create the shortcut for "File View" using F2
+        self.f2_file_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F2_FILE_VIEW), self)
+        self.f2_file_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(1))
+        
+        # Create the shortcut for "Converged View" using F3
+        self.f3_converged_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F3_CONVERGED_VIEW), self)
+        self.f3_converged_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
+
+        # Create the shortcut for "Pan" using the space bar, active only in "Design View"
+        self.pan_shortcut = QShortcut(QKeySequence(SHORTCUT_PAN), self)
+        self.pan_shortcut.activated.connect(self.activate_pan)
+                
+        # Create the shortcut for "Zoom" using the 'z' key, active only in "Design View"
+        self.zoom_shortcut = QShortcut(QKeySequence(SHORTCUT_ZOOM), self)
+        self.zoom_shortcut.activated.connect(self.activate_zoom)
+
+        # Create the shortcut for "Home" (reset graphics) using the 'a' key, active only in "Design View"
+        self.home_shortcut = QShortcut(QKeySequence(SHORTCUT_HOME), self)
+        self.home_shortcut.activated.connect(self.activate_home)
+
+        # Create the shortcut for "Save" using the 's' key, active only in "Design View"
+        self.save_button_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_BUTTON), self)
+        self.save_button_shortcut.activated.connect(self.activate_save)
+
+        # Create the shortcut for "Revert" using the 'r' key, active only in "Design View"
+        self.revert_shortcut = QShortcut(QKeySequence(SHORTCUT_REVERT), self)
+        self.revert_shortcut.activated.connect(self.activate_revert)
+
+        # Create the shortcut for "Cancel" using the 'c' key, active only in "Design View"
+        self.cancel_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL), self)
+        self.cancel_shortcut.activated.connect(self.activate_cancel)
+
+        # Create the additional shortcut for "Cancel" using "Ctrl+D", active only in "Design View"
+        self.cancel_ctrl_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL_DESIGN_VIEW), self)
+        self.cancel_ctrl_shortcut.activated.connect(self.activate_cancel)
+        
+        # Create the shortcut for "Undo" using the 'u' key, active only in "Design View"
+        self.undo_shortcut = QShortcut(QKeySequence(SHORTCUT_UNDO), self)
+        self.undo_shortcut.activated.connect(self.activate_undo)
+        
+        # Create the shortcut for toggling "History" using the 'h' key, active only in "Design View"
+        self.history_toggle_shortcut = QShortcut(QKeySequence(SHORTCUT_HISTORY_TOGGLE), self)
+        self.history_toggle_shortcut.activated.connect(self.toggle_history)
+
+        # Create the shortcut to toggle between Upper and Lower surfaces
+        self.toggle_surface_shortcut = QShortcut(QKeySequence(SHORTCUT_SURFACE_TOGGLE), self)
+        self.toggle_surface_shortcut.activated.connect(self.toggle_surface_if_design_view)
+        
+        # Create the shortcut for "Run PROFOIL" using the 'R' key, active only in "Design View"
+        self.run_profoil_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_RUN_DESIGN_VIEW), self)
+        self.run_profoil_design_view_shortcut.activated.connect(self.run_profoil_design_view)
+
+        # Create the shortcut for Alpha* Cursor edits using the 'E' key, active only in "Design View"
+        self.cursor_edit_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_CURSOR_EDIT_DESIGN_VIEW), self)
+        self.cursor_edit_design_view_shortcut.activated.connect(self.start_cursor_edits_design_view)
+
+        # Create the shortcut for "Cancel" using the 'D' key, active only in "Design View"
+        self.cancel_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL_DESIGN_VIEW), self)
+        self.cancel_design_view_shortcut.activated.connect(self.cancel_design_view)
+
         # Amend shortcut names
-        self.ammend_shortcut_names()
+        if SHOW_SHORTCUTS_ON_BUTTONS:
+            self.ammend_shortcut_names()
 
         # backup zoomed limits of an_ax so that upper-lower surface switching wont be affected
         self.an_ax.figure.canvas.mpl_connect('draw_event', self.bkp_an_ax_zoomed_limits)
@@ -194,24 +265,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             "Any unsaved data will be lost.\n          Continue?          ",
             QMessageBox.Yes | QMessageBox.Cancel) if AIRFOIL_CHANGE_WARNING else QMessageBox.Yes
 
-#======================================== CALLBACK FUNCTIONS ========================================
-    def on_profoil_in_text_changed(self):
-        """
-        Indicates there are some unsaved changes in the profoil.in file
-        by changing the color of the "Save" button
-        """
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
-
-    def save_planTextEdit_to_profoil(self):
-        """
-        saves the profoil.in file view, in to the profoil.in file.
-        """
-        p_intf.gen_buffer()
-        p_intf.save2profoil_in(self.plainTextEdit_profoil_in.toPlainText())
-
-        # upon saving change the save button color back to black
-        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black; font-style: normal;}')
-
+#==================================== CALLBACK FUNCTIONS [MENU] =====================================
     def menu_file_open(self, filename=None):
         """
         opens profoil.in file, if a session is current, warning will be shown.
@@ -222,9 +276,40 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             if KEEP_OLD_AIRFOIL_UPON_LOADING:
                 self.bkp_previous_line()    
 
-        filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'../runs', "Input File (*.in)")[0]
+        filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,self.default_open_dir, "Input File (*.in)")[0]
         if filename:
             self.load_in_file(filename)
+            # Store the path to be used for Save As
+            if KEEP_LAST_OPEN_PATH_AS_DEFAULT:
+                self.default_open_dir = str(Path(filename).parent)
+
+    def menu_file_save_as(self):
+        """
+        saves profoil.in file
+        """
+        if not self.ready_to_interact: return
+        filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', self.default_open_dir, "Input File (*.in)")[0]
+        if filename:
+            self.save_airfoil(filename)
+
+    def overlay_file_open(self, skiprows):
+        """
+        Overlays *.xy or *.dat file based on skiprows (0 for .xy, 1 for .dat)
+        """
+        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'.', "All Files (*.*)")[0]
+        if filename:
+            self.overlay_dat(filename, skiprows)
+
+#=================================== CALLBACK FUNCTIONS [BUTTONS] ===================================
+    def save_planTextEdit_to_profoil(self):
+        """
+        saves the profoil.in file view, in to the profoil.in file.
+        """
+        p_intf.gen_buffer()
+        p_intf.save2profoil_in(self.plainTextEdit_profoil_in.toPlainText())
+
+        # upon saving change the save button color back to black
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: black; font-style: normal;}')
 
     def start_cursor_edits(self, event=None):
         self.reset_toolbar()
@@ -270,17 +355,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.save_edits_to_file()
         self.cancel_cursor_inputs()
         self.canvas.setCursor(QtCore.Qt.ArrowCursor) # Reset to default cursor on the canvas
-
-    def save_edits_to_file(self):
-        """
-        Saves green line data in to the profoil.in file
-        """
-        nu_upper, alfa_upper = self.upper_nu_alfa_modi.get_data()
-        nu_lower, alfa_lower = self.lower_nu_alfa_modi.get_data()
-        nu_list = list(nu_upper) + list(nu_lower)
-        alfa_list = list(alfa_upper) + list(alfa_lower)
-        p_intf.gen_buffer()
-        p_intf.gen_input_file(nu_list, alfa_list, len(nu_upper))
 
     def undo_edits(self, event=None):
         """
@@ -347,23 +421,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.run_profoil()
         self.gui_fig.canvas.draw()
 
-    def menu_file_save(self):
-        """
-        saves profoil.in file
-        """
-        if not self.ready_to_interact: return
-        filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File' ,'.', "Input File (*.in)")[0]
-        if filename:
-            self.save_airfoil(filename)
-
-    def overlay_file_open(self, skiprows):
-        """
-        Overlays *.xy or *.dat file based on skiprows (0 for .xy, 1 for .dat)
-        """
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,'.', "All Files (*.*)")[0]
-        if filename:
-            self.overlay_dat(filename, skiprows)
-
+#================================== CALLBACK FUNCTIONS [SHORTCUTS] ==================================
     def save_on_shortcut(self):
         # Check if the current tab is "File View" (index 1)
         if self.tabWidget.currentIndex() == 1:
@@ -379,6 +437,41 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
             modified_lines = [line[1:] if line.startswith(("#","!")) else COMMENT_MARKER+line for line in selected_lines]
             cursor.insertText("\n".join(modified_lines))
 
+    def activate_pan (self): self.activate_tool_bar_action("Pan" )
+    def activate_zoom(self): self.activate_tool_bar_action("Zoom")
+    def activate_home(self): self.activate_tool_bar_action("Home")
+    def activate_save(self): self.activate_tool_bar_action("Save")
+
+    def activate_revert(self): self.activate_function_in_design_view(self.btn_revert)
+    def activate_cancel(self): self.activate_function_in_design_view(self.btn_cancel)
+    def activate_undo  (self): self.activate_function_in_design_view(self.btn_undo  )
+
+    def cancel_design_view(self)            : self.activate_function_in_design_view(self.cancel_cursor_inputs)
+    def run_profoil_design_view(self)       : self.activate_function_in_design_view(self.run_profoil)
+    def toggle_surface_if_design_view(self) : self.activate_function_in_design_view(self.toggle_surface_selection)
+    def start_cursor_edits_design_view(self): self.activate_function_in_design_view(self.start_cursor_edits)
+    
+    def toggle_history(self):
+        # Ensure the "Design View" tab is active
+        if self.tabWidget.currentIndex() == 0:
+            # Toggle the check state of the "History" checkbox
+            current_state = self.checkBox_history.isChecked()
+            self.checkBox_history.setChecked(not current_state)
+            # Call the function to toggle the visibility of the history
+            self.toggle_previous_plots(not current_state)
+
+#===================================== CALLBACK HELPERS OR MISC =====================================
+    def save_edits_to_file(self):
+        """
+        Saves green line data in to the profoil.in file
+        """
+        nu_upper, alfa_upper = self.upper_nu_alfa_modi.get_data()
+        nu_lower, alfa_lower = self.lower_nu_alfa_modi.get_data()
+        nu_list = list(nu_upper) + list(nu_lower)
+        alfa_list = list(alfa_upper) + list(alfa_lower)
+        p_intf.gen_buffer()
+        p_intf.gen_input_file(nu_list, alfa_list, len(nu_upper))
+
     def save_airfoil(self, out_file):
         """
         Saves the profoil.in file from the WORKDIR in to a specified location with a given name.
@@ -388,6 +481,38 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         file_path.parent.mkdir(parents=True, exist_ok=True)
         with file_path.open("w") as f:
             f.write(Path(WORKDIR/"profoil.in").open().read())
+
+    def on_profoil_in_text_changed(self):
+        """
+        Indicates there are some unsaved changes in the profoil.in file
+        by changing the color of the "Save" button
+        """
+        self.btn_save_profoil_in.setStyleSheet('QPushButton {color: red; font-style: italic;}')
+
+    def activate_tool_bar_action(self, action_name):
+        # Ensure the "Design View" tab is active
+        if self.tabWidget.currentIndex() == 0:
+            # Find the Pan action in the toolbar and trigger it
+            for action in self.tool_bar.actions():
+                if action.text() == action_name:
+                    action.trigger()
+                    break
+
+    def activate_function_in_design_view(self, func):
+        # Ensure the "Design View" tab is active
+        if self.tabWidget.currentIndex() == 0:
+            # Trigger the revert button action or execute the function
+            try:
+                func.click()
+            except:
+                func()
+
+    def toggle_surface_selection(self):
+        # Toggle between Upper and Lower surface selection
+        if self.radio_upper_surface.isChecked():
+            self.radio_lower_surface.setChecked(True)
+        else:
+            self.radio_upper_surface.setChecked(True)  
 
 #======================================== UTILITY FUNCTIONS =========================================
     def load_canvas(self):
@@ -525,11 +650,11 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
     def ammend_shortcut_names(self):
         """
         Append menu items and button names with the shortcuts given in the preferences.py
-        menu items has to be fixed length for better visual appeal
+        menu action text has to be fixed length for better visual appeal
         """
-        MENU_TEXT_LENGTH = 15
+        MENU_TEXT_LENGTH = 24
         self.actionOpen.setText(f"{self.actionOpen.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
-        self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE))}({SHORTCUT_SAVE})")
+        self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE_AS))}({SHORTCUT_SAVE_AS})")
         
         self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_EDIT})")
         self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_EXEC})")

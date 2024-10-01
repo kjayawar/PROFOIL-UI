@@ -154,6 +154,12 @@ class ProfoilCanvas:
         self.xy_ax = self.gui_fig.add_subplot(grid[ 3, 0])
         self.an_ax = self.gui_fig.add_subplot(grid[:3, 1])
 
+        # Set zorder for each axis.
+        # Airfoil xy is on top (3), then alpha* (2), then ue (1).
+        self.xy_ax.set_zorder(3)
+        self.an_ax.set_zorder(2)
+        self.ue_ax.set_zorder(1)
+        
         self.gui_fig.subplots_adjust(left=0.05, right=0.98, top=0.96, bottom=0.08, hspace = 0.02, wspace=0.02)
         self.gui_fig.canvas.mpl_connect('button_press_event', self.on_click)
 
