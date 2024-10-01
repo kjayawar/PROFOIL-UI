@@ -188,7 +188,7 @@ class ProfoilCanvas:
 
     def update_ylim(self, ax, y_lower):
         """
-        Given a bounded x-range set y-range of an axis keeping the AR or bbox size intact
+        Given a bounded x-range set y-range of an axis keeping the AR and bbox size intact
         https://github.com/matplotlib/matplotlib/issues/28673
         """
         bbox = ax.get_window_extent().transformed(ax.get_figure().dpi_scale_trans.inverted())
