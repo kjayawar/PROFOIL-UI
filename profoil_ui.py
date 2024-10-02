@@ -70,102 +70,161 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         """
         maps button/menu/combo_box and tab signals to functions
         """
-        # Button Events
+        # ================================= STARAT EDITS =================================
+        # -->  BUTTON ACTION
         self.btn_start_edits.clicked.connect(self.start_cursor_edits)
+        # -->  FIRST SHORTCUT
+        self.edit_shortcut = QShortcut(QKeySequence(SHORTCUT_EDIT), self)
+        self.edit_shortcut.activated.connect(self.start_cursor_edits)
+        # -->  SECOND SHORTCUT
+        # Create the shortcut for Alpha* Cursor edits using the 'E' key, active only in "Design View"
+        self.cursor_edit_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_CURSOR_EDIT_DESIGN_VIEW), self)
+        self.cursor_edit_design_view_shortcut.activated.connect(self.start_cursor_edits_design_view)
+
+        # ==================================== CANCEL ====================================
+        # -->  BUTTON ACTION
         self.btn_cancel.clicked.connect(self.cancel_cursor_inputs)
+        # ->  FIRST SHORTCUT : Create the additional shortcut for "Cancel" using "Ctrl+D"
+        self.cancel_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL), self)
+        self.cancel_shortcut.activated.connect(self.cancel_cursor_inputs)
+        #  -->  SECOND SHORTCUT: Create the shortcut for "Cancel" using the 'D' key, active only in "Design View"
+        self.cancel_designview_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL_DESIGN_VIEW), self)
+        self.cancel_designview_shortcut.activated.connect(self.activate_cancel)
+
+        # ================================= APPLY EDITS ==================================
+        # -->  BUTTON ACTION
         self.btn_apply_edits.clicked.connect(self.apply_edits)
+
+        # ===================================== UNDO =====================================
+        # -->  BUTTON ACTION
         self.btn_undo.clicked.connect(self.undo_edits)
+        # -->  FIRST SHORTCUT : Create the shortcut for "Undo" using the 'u' key, active only in "Design View"
+        self.undo_shortcut = QShortcut(QKeySequence(SHORTCUT_UNDO), self)
+        self.undo_shortcut.activated.connect(self.activate_undo)
+
+        # ================================ PLOT FROM FILE ================================
+        # -->  BUTTON ACTION
         self.btn_plot_from_file.clicked.connect(self.plot_from_file)
+
+        # ================================= RUN PROFOIL ==================================
+        # -->  BUTTON ACTION
         self.btn_run_profoil.clicked.connect(self.run_profoil)
+        # -->  FIRST SHORTCUT : Create the shortcut to trigger "Run Profoil"
+        self.run_profoil_shortcut = QShortcut(QKeySequence(SHORTCUT_EXEC), self)
+        self.run_profoil_shortcut.activated.connect(self.run_profoil)
+        # -->  SECOND SHORTCUT: Create the shortcut for "Run PROFOIL" using the 'R' key, active only in "Design View"
+        self.run_profoil_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_RUN_DESIGN_VIEW), self)
+        self.run_profoil_design_view_shortcut.activated.connect(self.run_profoil_design_view)
+
+        # ==================================== REVERT ====================================
+        # -->  BUTTON ACTION
         self.btn_revert.clicked.connect(self.revert)
-        self.btn_save_profoil_in.clicked.connect(self.save_planTextEdit_to_profoil)
-        self.btn_annotate.clicked.connect(self.annotate_profoil_in)
+        # -->  FIRST SHORTCUT : Create the shortcut for "Revert" using the 'r' key, active only in "Design View"
+        self.revert_shortcut = QShortcut(QKeySequence(SHORTCUT_REVERT), self)
+        self.revert_shortcut.activated.connect(self.activate_revert)
 
-        # Menu Events
+        # ============================= [MENU] FILE -> OPEN ==============================
+        # -->  MENU ACTION
         self.actionOpen.triggered.connect(self.menu_file_open)
-        self.actionSave.triggered.connect(self.menu_file_save_as)
-        self.actionProfoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=0))
-        self.actionXFoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=1))
-        self.actionClear_Overlay.triggered.connect(self.clear_overlay)
-        self.actionPROFOIL.triggered.connect(self.menu_about_profoil)
-        self.actionPROFOIL_UI.triggered.connect(self.menu_about_profoil_ui)
-
-        # CheckBox Events (History and Grid)
-        self.checkBox_grid.stateChanged.connect(self.toggle_grid_lines)
-        self.checkBox_airfoil_grid.stateChanged.connect(self.toggle_airfoil_grid_lines)
-        self.checkBox_history.stateChanged.connect(self.toggle_previous_plots)
-
-        # Radio button Events (Upper / Lower Surface Switch)
-        self.radio_upper_surface.toggled.connect(lambda: self.select_surface("Upper"))
-        self.radio_lower_surface.toggled.connect(lambda: self.select_surface("Lower"))
-
-        # Apply the syntax highlighter to the profoil.in text editor
-        self.highlighter = CommentHighlighter(self.plainTextEdit_profoil_in.document())
-
-        # Connect textChanged signal to slot
-        self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
-
-        # New connection for the "File | Save" button
-        self.btn_file_save.clicked.connect(self.menu_file_save_as)
-        self.save_as_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_AS), self)
-        self.save_as_shortcut.activated.connect(self.menu_file_save_as)
-
-        # New connection for the "File | Open" button
+        # --> SHORTCUT BUTTON : New connection for the "File | Open" button /shortcut to trigger "File | Open"
         self.btn_file_open.clicked.connect(self.menu_file_open)
-
-        # New connections for the "Overlay" buttons
-        self.btn_overlay_xy.clicked.connect(lambda:self.overlay_file_open(skiprows=0))
-        self.btn_overlay_dat.clicked.connect(lambda:self.overlay_file_open(skiprows=1))
-        self.btn_overlay_clear.clicked.connect(self.clear_overlay)
-
-        # Create the shortcut to trigger "File | Open"
+        # --> KEYBOARD SHORTCUT
         self.open_shortcut = QShortcut(QKeySequence(SHORTCUT_OPEN), self)
         self.open_shortcut.activated.connect(self.menu_file_open)
 
-        # Create the shortcut to trigger "Profoil.in Save"
+        # ============================= [MENU] FILE -> SAVE ==============================
+        
+        self.actionSave.triggered.connect(self.menu_file_save_as)
+        # --> SHORTCUT BUTTON : New connection for the "File | Save As" button
+        self.btn_file_save.clicked.connect(self.menu_file_save_as)
+        # --> KEYBOARD SHORTCUT
+        self.save_as_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_AS), self)
+        self.save_as_shortcut.activated.connect(self.menu_file_save_as)
+
+        # ========================== [MENU] OVERLAY -> XY FILE ===========================
+        # -->  MENU ACTION
+        self.actionProfoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=0))
+        # --> SHORTCUT BUTTON : New connections for the "Overlay" actions
+        self.btn_overlay_xy.clicked.connect(lambda:self.overlay_file_open(skiprows=0))
+
+        # ========================== [MENU] OVERLAY -> DAT FILE ==========================
+        # -->  MENU ACTION
+        self.actionXFoil_dat_File.triggered.connect(lambda:self.overlay_file_open(skiprows=1))
+        # --> SHORTCUT BUTTON : New connections for the "Overlay" actions
+        self.btn_overlay_dat.clicked.connect(lambda:self.overlay_file_open(skiprows=1))
+
+        # ======================= [MENU] OVERLAY -> CLEAR OVERLAY ========================
+        # -->  MENU ACTION
+        self.actionClear_Overlay.triggered.connect(self.clear_overlay)
+        # --> SHORTCUT BUTTON : New connections for the "Clear Overlay"
+        self.btn_overlay_clear.clicked.connect(self.clear_overlay)
+
+        # ====================== [MENU] ABOUT -> PROFOIL/PROFOIL_UI ======================
+        # -->  MENU ACTION
+        self.actionPROFOIL.triggered.connect(self.menu_about_profoil)
+        self.actionPROFOIL_UI.triggered.connect(self.menu_about_profoil_ui)
+
+        # ============================ [FILE VIEW] SAVE EDITS ============================
+        # -->  BUTTON ACTION
+        self.btn_save_profoil_in.clicked.connect(self.save_planTextEdit_to_profoil)
+        # --> KEYBOARD SHORTCUT : Create the shortcut to trigger "Profoil.in Save" in File View
         self.save_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE), self)
         self.save_shortcut.activated.connect(self.save_on_shortcut)
 
-        # Create the shortcut to trigger "Start Edits"
-        self.edit_shortcut = QShortcut(QKeySequence(SHORTCUT_EDIT), self)
-        self.edit_shortcut.activated.connect(self.start_cursor_edits)
-
-        # Create the shortcut to trigger "Run Profoil"
-        self.run_profoil_shortcut = QShortcut(QKeySequence(SHORTCUT_EXEC), self)
-        self.run_profoil_shortcut.activated.connect(self.run_profoil)
-
-        # Create the shortcut to switch to "Design View"
-        self.design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB1), self)
-        self.design_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(0))
-        
-        # Create the shortcut to switch to "File View"
-        self.file_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB2), self)
-        self.file_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(1))
-        
-        # Create the shortcut to switch to "Converged Data"
-        self.converged_data_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB3), self)
-        self.converged_data_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
-
-        # Create the shortcut for "Toggle Comments"
-        self.toggle_comment_shortcut = QShortcut(QKeySequence(SHORTCUT_TOGGLE_COMMENT), self)
-        self.toggle_comment_shortcut.activated.connect(self.toggle_comment)
-
-        # Create the shortcut for "Annotate"
+        # ============================= [FILE VIEW] ANNOTATE =============================
+        # -->  BUTTON ACTION
+        self.btn_annotate.clicked.connect(self.annotate_profoil_in)
+        # --> KEYBOARD SHORTCUT : Create the shortcut for "Annotate"
         self.annotate_shortcut = QShortcut(QKeySequence(SHORTCUT_ANNOTATE), self)
         self.annotate_shortcut.activated.connect(self.annotate_profoil_in)
 
-        # Create the shortcut for "Design View" using F1
+        # ========================= [FILE VIEW] TOGGLE COMMENTS ==========================
+        # --> KEYBOARD SHORTCUT :Create the shortcut for "Toggle Comments"
+        self.toggle_comment_shortcut = QShortcut(QKeySequence(SHORTCUT_TOGGLE_COMMENT), self)
+        self.toggle_comment_shortcut.activated.connect(self.toggle_comment)
+
+        # =============================== CHECKBOX ACTIONS ===============================
+        # -->  TICKBOX ACTION : CheckBox Events (History and Grid)
+        self.checkBox_grid.stateChanged.connect(self.toggle_grid_lines)
+        self.checkBox_airfoil_grid.stateChanged.connect(self.toggle_airfoil_grid_lines)
+        self.checkBox_history.stateChanged.connect(self.toggle_previous_plots)
+        # --> KEYBOARD SHORTCUT : Create the shortcut for toggling "History" using the 'h' key, active only in "Design View"
+        self.history_toggle_shortcut = QShortcut(QKeySequence(SHORTCUT_HISTORY_TOGGLE), self)
+        self.history_toggle_shortcut.activated.connect(self.toggle_history)
+
+        # ======================== RADIO BUTTONS [SELECT SURFACE] ========================
+        # Radio button Events (Upper / Lower Surface Switch)
+        self.radio_upper_surface.toggled.connect(lambda: self.select_surface("Upper"))
+        self.radio_lower_surface.toggled.connect(lambda: self.select_surface("Lower"))
+        # --> KEYBOARD SHORTCUT : Create the shortcut to toggle between Upper and Lower surfaces
+        self.toggle_surface_shortcut = QShortcut(QKeySequence(SHORTCUT_SURFACE_TOGGLE), self)
+        self.toggle_surface_shortcut.activated.connect(self.toggle_surface_if_design_view)
+
+        # ========================= [TAB] SWITCH TO DESIGN VIEW ==========================
+        # FIRST SHORTCUT : Create the shortcut to switch to "Design View"
+        self.design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB1), self)
+        self.design_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(0))
+        # SECOND SHORTCUT : Create the shortcut for "Design View" using F1
         self.f1_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F1_DESIGN_VIEW), self)
         self.f1_design_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(0))
-        
-        # Create the shortcut for "File View" using F2
+
+        # ========================== [TAB] SWITCH TO FILE VIEW ===========================
+        # FIRST SHORTCUT : Create the shortcut to switch to "File View"
+        self.file_view_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB2), self)
+        self.file_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(1))
+        # SECOND SHORTCUT : Create the shortcut for "File View" using F2
         self.f2_file_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F2_FILE_VIEW), self)
         self.f2_file_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(1))
-        
-        # Create the shortcut for "Converged View" using F3
+
+        # ======================== [TAB] SWITCH TO CONVERGED VIEW ========================
+        # FIRST SHORTCUT : Create the shortcut to switch to "Converged Data"
+        self.converged_data_shortcut = QShortcut(QKeySequence(SHORTCUT_TAB3), self)
+        self.converged_data_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
+        # SECOND SHORTCUT : Create the shortcut for "Converged View" using F3
         self.f3_converged_view_shortcut = QShortcut(QKeySequence(SHORTCUT_F3_CONVERGED_VIEW), self)
         self.f3_converged_view_shortcut.activated.connect(lambda: self.tabWidget.setCurrentIndex(2))
 
+        # =================== [MATPLOTLIB] NAVIGATION TOOLBAR ACTIONS ====================
         # Create the shortcut for "Pan" using the space bar, active only in "Design View"
         self.pan_shortcut = QShortcut(QKeySequence(SHORTCUT_PAN), self)
         self.pan_shortcut.activated.connect(self.activate_pan)
@@ -182,49 +241,21 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.save_button_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_BUTTON), self)
         self.save_button_shortcut.activated.connect(self.activate_save)
 
-        # Create the shortcut for "Revert" using the 'r' key, active only in "Design View"
-        self.revert_shortcut = QShortcut(QKeySequence(SHORTCUT_REVERT), self)
-        self.revert_shortcut.activated.connect(self.activate_revert)
+        # ======================== OTHER SIGNALLING EVENTS->SLOTS ========================
 
-        # Create the shortcut for "Cancel" using the 'c' key, active only in "Design View"
-        self.cancel_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL), self)
-        self.cancel_shortcut.activated.connect(self.activate_cancel)
+        # Apply the syntax highlighter to the profoil.in text editor
+        self.highlighter = CommentHighlighter(self.plainTextEdit_profoil_in.document())
 
-        # Create the additional shortcut for "Cancel" using "Ctrl+D", active only in "Design View"
-        self.cancel_ctrl_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL_DESIGN_VIEW), self)
-        self.cancel_ctrl_shortcut.activated.connect(self.activate_cancel)
-        
-        # Create the shortcut for "Undo" using the 'u' key, active only in "Design View"
-        self.undo_shortcut = QShortcut(QKeySequence(SHORTCUT_UNDO), self)
-        self.undo_shortcut.activated.connect(self.activate_undo)
-        
-        # Create the shortcut for toggling "History" using the 'h' key, active only in "Design View"
-        self.history_toggle_shortcut = QShortcut(QKeySequence(SHORTCUT_HISTORY_TOGGLE), self)
-        self.history_toggle_shortcut.activated.connect(self.toggle_history)
-
-        # Create the shortcut to toggle between Upper and Lower surfaces
-        self.toggle_surface_shortcut = QShortcut(QKeySequence(SHORTCUT_SURFACE_TOGGLE), self)
-        self.toggle_surface_shortcut.activated.connect(self.toggle_surface_if_design_view)
-        
-        # Create the shortcut for "Run PROFOIL" using the 'R' key, active only in "Design View"
-        self.run_profoil_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_RUN_DESIGN_VIEW), self)
-        self.run_profoil_design_view_shortcut.activated.connect(self.run_profoil_design_view)
-
-        # Create the shortcut for Alpha* Cursor edits using the 'E' key, active only in "Design View"
-        self.cursor_edit_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_CURSOR_EDIT_DESIGN_VIEW), self)
-        self.cursor_edit_design_view_shortcut.activated.connect(self.start_cursor_edits_design_view)
-
-        # Create the shortcut for "Cancel" using the 'D' key, active only in "Design View"
-        self.cancel_design_view_shortcut = QShortcut(QKeySequence(SHORTCUT_CANCEL_DESIGN_VIEW), self)
-        self.cancel_design_view_shortcut.activated.connect(self.cancel_design_view)
-
-        # Amend shortcut names
-        if SHOW_SHORTCUTS_ON_BUTTONS:
-            self.ammend_shortcut_names()
+        # Connect textChanged signal to slot
+        self.plainTextEdit_profoil_in.textChanged.connect(self.on_profoil_in_text_changed)
 
         # backup zoomed limits of an_ax so that upper-lower surface switching wont be affected
         self.an_ax.figure.canvas.mpl_connect('draw_event', self.bkp_an_ax_zoomed_limits)
 
+        # Amend shortcut names
+        if SHOW_SHORTCUTS_ON_BUTTONS:
+            self.ammend_shortcut_names()
+            
 #============================================= DIALOGS ==============================================
     def message_box_without_beep(self, title, text):
         """ pops a Message box with given title and text, without beep """

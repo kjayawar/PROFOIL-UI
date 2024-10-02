@@ -38,9 +38,9 @@ AN_CURR_LINE_LINESTYLE          = '--'              # dotted lines for current p
 AN_PRES_LINE_LINESTYLE          = '--'              # dotted lines for prescribed plot
 AN_MODI_LINE_LINESTYLE          = '-'               # continuous lines for main modifiable line
 
-AN_PREV_LINE_COLOR              = "black"           # color of previous plot
-AN_CURR_LINE_COLOR              = "darkviolet"      # color of current plot
-AN_PRES_LINE_COLOR              = "blue"            # color of prescribed plot
+AN_PREV_LINE_COLOR              = "lightgrey"       # previous profoil.in after first run
+AN_CURR_LINE_COLOR              = "mediumorchid"    # converged alpha* solution from profoil.dmp after run
+AN_PRES_LINE_COLOR              = "yellowgreen"     # prescribed alfa* in the profoil.in file
 AN_MODI_LINE_COLOR              = "green"           # color of modifiable line
 
 AN_SPLN_LINE_LINESTYLE          = '--+'             # dotted lines with + marks for spline
@@ -134,7 +134,7 @@ SHORTCUT_TAB3                   = "Ctrl+3"          # Shortcut for switching tab
 # Even shorter [Alternative] Shortcuts when in Design View
 SHORTCUT_RUN_DESIGN_VIEW        = "R"               # Shortcut for Run PROFOIL in Design View
 SHORTCUT_CURSOR_EDIT_DESIGN_VIEW= "E"               # Shortcut for Alpha* Cursor edits in Design View
-SHORTCUT_CANCEL_DESIGN_VIEW     = "C"               # Shortcut for Cancel in Design View
+SHORTCUT_CANCEL_DESIGN_VIEW     = "D"               # Shortcut for Cancel in Design View
 
 SHORTCUT_F1_DESIGN_VIEW         = "F1"              # Alternative Shortcut for Design View
 SHORTCUT_F2_FILE_VIEW           = "F2"              # Alternative Shortcut for File View
