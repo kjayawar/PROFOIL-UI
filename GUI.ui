@@ -60,7 +60,7 @@
             <item>
              <widget class="QCheckBox" name="checkBox_grid">
               <property name="text">
-               <string>Grid</string>
+               <string>Alpha* Grid</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -77,24 +77,24 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="checkBox_history">
-              <property name="text">
-               <string>History</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_history">
+            <property name="text">
+             <string>History</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,0,0">
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="lbl_surface_sel">
               <property name="text">
-               <string>Surface</string>
+               <string>Alpha*</string>
               </property>
              </widget>
             </item>

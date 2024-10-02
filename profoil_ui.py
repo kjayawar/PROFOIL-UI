@@ -652,12 +652,23 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         Append menu items and button names with the shortcuts given in the preferences.py
         menu action text has to be fixed length for better visual appeal
         """
+        # Menu Actions
         MENU_TEXT_LENGTH = 24
         self.actionOpen.setText(f"{self.actionOpen.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
         self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE_AS))}({SHORTCUT_SAVE_AS})")
+
+        # Design View buttons        
+        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_CURSOR_EDIT_DESIGN_VIEW}, {SHORTCUT_EDIT})")
+        self.btn_cancel.setText(f"{self.btn_cancel.text()} ({SHORTCUT_CANCEL_DESIGN_VIEW}, {SHORTCUT_CANCEL})")
+        self.btn_undo.setText(f"{self.btn_undo.text()} ({SHORTCUT_UNDO})")
+        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_RUN_DESIGN_VIEW}, {SHORTCUT_EXEC})")
+        self.btn_revert.setText(f"{self.btn_revert.text()} ({SHORTCUT_REVERT})")
         
-        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_EDIT})")
-        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_EXEC})")
+        # Design View labels/checkbox
+        self.checkBox_history.setText(f"{self.checkBox_history.text()} ({SHORTCUT_HISTORY_TOGGLE})")
+        self.lbl_surface_sel.setText(f"{self.lbl_surface_sel.text()} ({SHORTCUT_SURFACE_TOGGLE})")
+
+        # FileView Buttons
         self.btn_save_profoil_in.setText(f"{self.btn_save_profoil_in.text()} ({SHORTCUT_SAVE})")
         self.btn_annotate.setText(f"{self.btn_annotate.text()} ({SHORTCUT_ANNOTATE})")
 

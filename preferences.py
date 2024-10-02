@@ -114,7 +114,6 @@ SHORTCUT_EDIT                   = "Ctrl+E"          # Shortcut for Start Edits
 SHORTCUT_CANCEL                 = "Ctrl+D"          # Shortcut for Cancel Edits
 SHORTCUT_EXEC                   = "Ctrl+R"          # Shortcut for Run PROFOIL
 SHORTCUT_REVERT                 = "T"               # Shortcut for Revert action in Design View
-SHORTCUT_CANCEL                 = "C"               # Shortcut for Cancel action in Design View
 SHORTCUT_UNDO                   = "U"               # Shortcut for Undo action in Design View
 SHORTCUT_HISTORY_TOGGLE         = "H"               # Shortcut for toggling History in Design View
 SHORTCUT_SURFACE_TOGGLE         = "Q"               # Shortcut to toggle between Upper and Lower surface alpha* selection
@@ -135,7 +134,7 @@ SHORTCUT_TAB3                   = "Ctrl+3"          # Shortcut for switching tab
 # Even shorter [Alternative] Shortcuts when in Design View
 SHORTCUT_RUN_DESIGN_VIEW        = "R"               # Shortcut for Run PROFOIL in Design View
 SHORTCUT_CURSOR_EDIT_DESIGN_VIEW= "E"               # Shortcut for Alpha* Cursor edits in Design View
-SHORTCUT_CANCEL_DESIGN_VIEW     = "D"               # Shortcut for Cancel in Design View
+SHORTCUT_CANCEL_DESIGN_VIEW     = "C"               # Shortcut for Cancel in Design View
 
 SHORTCUT_F1_DESIGN_VIEW         = "F1"              # Alternative Shortcut for Design View
 SHORTCUT_F2_FILE_VIEW           = "F2"              # Alternative Shortcut for File View
