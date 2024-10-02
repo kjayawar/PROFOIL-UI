@@ -38,9 +38,9 @@ AN_CURR_LINE_LINESTYLE          = '--'              # dotted lines for current p
 AN_PRES_LINE_LINESTYLE          = '--'              # dotted lines for prescribed plot
 AN_MODI_LINE_LINESTYLE          = '-'               # continuous lines for main modifiable line
 
-AN_PREV_LINE_COLOR              = "black"           # color of previous plot
-AN_CURR_LINE_COLOR              = "darkviolet"      # color of current plot
-AN_PRES_LINE_COLOR              = "blue"            # color of prescribed plot
+AN_PREV_LINE_COLOR              = "lightgrey"       # previous profoil.in after first run
+AN_CURR_LINE_COLOR              = "mediumorchid"    # converged alpha* solution from profoil.dmp after run
+AN_PRES_LINE_COLOR              = "yellowgreen"     # prescribed alfa* in the profoil.in file
 AN_MODI_LINE_COLOR              = "green"           # color of modifiable line
 
 AN_SPLN_LINE_LINESTYLE          = '--+'             # dotted lines with + marks for spline
@@ -101,23 +101,51 @@ MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
 #================================ CONFIG RELATED TO AIRFOIL LOADING =================================
 
-AIRFOIL_CHANGE_WARNING          = True              # A warning dialog upon changing active session
-KEEP_OLD_AIRFOIL_UPON_LOADING   = False             # Old airfoil data is preserved upon switching
+AIRFOIL_CHANGE_WARNING          = False             # A warning dialog upon changing active session
+KEEP_OLD_AIRFOIL_UPON_LOADING   = True              # Old airfoil data is preserved upon switching
                                                     # when set to True
 
 #======================================== KEYBOARD SHORTCUTS ========================================
-
+# Main shortcuts
 SHORTCUT_OPEN                   = "Ctrl+O"          # Shortcut for File | Open Dialog     
-SHORTCUT_SAVE                   = "Ctrl+S"          # Shortcut for profoil.in file save in FileView
-SHORTCUT_EDIT                   = "Ctrl+E"          # Shortcut for Start Edits 
+SHORTCUT_SAVE                   = "Ctrl+S"          # Shortcut for profoil.in file save in "File View"
+SHORTCUT_SAVE_AS                = "Ctrl+Shift+S"    # Shortcut for File | 'Save As' in "Design View"
+SHORTCUT_EDIT                   = "Ctrl+E"          # Shortcut for Start Edits
+SHORTCUT_CANCEL                 = "Ctrl+D"          # Shortcut for Cancel Edits
 SHORTCUT_EXEC                   = "Ctrl+R"          # Shortcut for Run PROFOIL
+SHORTCUT_REVERT                 = "T"               # Shortcut for Revert action in Design View
+SHORTCUT_UNDO                   = "U"               # Shortcut for Undo action in Design View
+SHORTCUT_HISTORY_TOGGLE         = "H"               # Shortcut for toggling History in Design View
+SHORTCUT_SURFACE_TOGGLE         = "Q"               # Shortcut to toggle between Upper and Lower surface alpha* selection
+SHORTCUT_TOGGLE_COMMENT         = "Ctrl+/"          # Shortcut for toggling comment lines
+SHORTCUT_ANNOTATE               = "Ctrl+W"          # Shortcut for annotating profoil.in file
+
+# Shortcuts for matplotlib toolbar in "Design View" tab:
+SHORTCUT_HOME                   = "A"               # Shortcut for Home action (reset graphics) in Design View
+SHORTCUT_PAN                    = "Space"           # Shortcut for Pan action in Design View
+SHORTCUT_ZOOM                   = "Z"               # Shortcut for Zoom action in Design View
+SHORTCUT_SAVE_BUTTON            = "S"               # Shortcut for Save action in Design View
+
+# Tab switching shortcuts
 SHORTCUT_TAB1                   = "Ctrl+1"          # Shortcut for switching tab to "Design View"
 SHORTCUT_TAB2                   = "Ctrl+2"          # Shortcut for switching tab to "File View"
 SHORTCUT_TAB3                   = "Ctrl+3"          # Shortcut for switching tab to "Converged View"
-SHORTCUT_TOGGLE_COMMENT         = "Ctrl+/"          # Shortcut for toggling comment lines
-SHORTCUT_ANNOTATE               = "Ctrl+A"          # Shortcut for annotating profoil.in file
+
+# Even shorter [Alternative] Shortcuts when in Design View
+SHORTCUT_RUN_DESIGN_VIEW        = "R"               # Shortcut for Run PROFOIL in Design View
+SHORTCUT_CURSOR_EDIT_DESIGN_VIEW= "E"               # Shortcut for Alpha* Cursor edits in Design View
+SHORTCUT_CANCEL_DESIGN_VIEW     = "D"               # Shortcut for Cancel in Design View
+
+SHORTCUT_F1_DESIGN_VIEW         = "F1"              # Alternative Shortcut for Design View
+SHORTCUT_F2_FILE_VIEW           = "F2"              # Alternative Shortcut for File View
+SHORTCUT_F3_CONVERGED_VIEW      = "F3"              # Alternative Shortcut for Converged View
 
 #========================================== COMMENT STYLE ===========================================
 
 COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as comment markers
 COMMENT_COLOR                   = "green"           # Choose comment color
+
+#========================================== MISCELLANEOUS ===========================================
+SHOW_SHORTCUTS_ON_BUTTONS       = True              # Buttons show shortcuts when set - ex "Save (Ctrl+S)"
+KEEP_LAST_OPEN_PATH_AS_DEFAULT  = True              # Set to True to use the last open path for Save As; 
+                                                    # False to use ~/runs as the default folder

@@ -101,8 +101,8 @@ MAIN_WINDOW_HEIGHT              =  870              # Main window height
 
 #================================ CONFIG RELATED TO AIRFOIL LOADING =================================
 
-AIRFOIL_CHANGE_WARNING          = False             # A warning dialog upon changing active session
-KEEP_OLD_AIRFOIL_UPON_LOADING   = True              # Old airfoil data is preserved upon switching
+AIRFOIL_CHANGE_WARNING          = True              # A warning dialog upon changing active session
+KEEP_OLD_AIRFOIL_UPON_LOADING   = False             # Old airfoil data is preserved upon switching
                                                     # when set to True
 
 #======================================== KEYBOARD SHORTCUTS ========================================

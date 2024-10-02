@@ -86,7 +86,7 @@ IFTP2_dict = {
 
 #======================================== ITP.. Definitions =========================================
 ITP_1_val_dict ={
-	1 : "Phi for segment {}",
+	1 : "Phi of segment {}",
 	4 : "Vi (iteration on velocity level allowed only once) for segment {}",
 	5 : "Vi_tilde for segment {}",
 	6 : "Alpha* for segment {}",
@@ -159,48 +159,48 @@ LLBE_dict = {
 }
 
 # ======================================= NEWT1.. Descriptions =======================================
-NEWT1G0_description = """
+NEWT1G0_description = """\
 # Specify {} = {} 
 # Iterate on {}.
 {}{}"""
 
-NEWT1G1_description = """
+NEWT1G1_description = """\
 # Specify {} = {} @ {} 
 # Iterate on {}.
 {}{}"""
 
-NEWT1S0_description = """
+NEWT1S0_description = """\
 # Specify {} at the {} {} = {} 
 # Iterate on {}.
 {}{}"""
 
-NEWT1S1_description = """
+NEWT1S1_description = """\
 # Specify {} = {} at the {} {} for Re={}
 # Iterate on {}.
 {}{}"""
 
-NEWT1S2_description = """
+NEWT1S2_description = """\
 # Specify {} = {} at the {} {} @ alpha of {} degrees and Re={} 
 # Iterate on {}.
 {}{}"""
 
 # ======================================= NEWT2.. Descriptions =======================================
 
-NEWT2SD0_description = """
+NEWT2SD0_description = """\
 # Specify {}
 # Iterate on DELV for segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
 # Specs are {}
 {}{}"""
 
-NEWT2SD1_description = """
+NEWT2SD1_description = """\
 # Specify {}
 # Iterating on DELV for segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
 # Specs are {} for given Re = {}
 {}{}"""
 
-NEWT2SD2_description = """
+NEWT2SD2_description = """\
 # Specify {}
 # Iterate on DELV for segment {} velocity distribution
 # Specification(s) given by the [SubSegment arc length | SubSegment tilde] pairs in the proceeding {}; 
