@@ -703,7 +703,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # hence the focus is set on the plainTextEdit_profoil_in
         self.plainTextEdit_profoil_in.setFocus()
 
-    def ammend_shortcut_names(self):
+    def amend_shortcut_names(self):
         """
         Append menu items and button names with the shortcuts given in the preferences.py
         menu action text has to be fixed length for better visual appeal
@@ -715,10 +715,19 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE_AS))}({SHORTCUT_SAVE_AS})")
 
         # Design View buttons        
-        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_CURSOR_EDIT_DESIGN_VIEW}{', '+SHORTCUT_EDIT if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
-        self.btn_cancel.setText(f"{self.btn_cancel.text()} ({SHORTCUT_CANCEL_DESIGN_VIEW}{', '+SHORTCUT_CANCEL if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
+        self.btn_start_edits.setText(
+             self.btn_start_edits.text()+
+             f" ({SHORTCUT_CURSOR_EDIT_DESIGN_VIEW}"+
+             f"{', '+SHORTCUT_EDIT   if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
+        self.btn_cancel.setText(
+             self.btn_cancel.text()+
+             f" ({SHORTCUT_CANCEL_DESIGN_VIEW}"+
+             f"{', '+SHORTCUT_CANCEL if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
+        self.btn_run_profoil.setText(
+             self.btn_run_profoil.text()+
+             f" ({SHORTCUT_RUN_DESIGN_VIEW}"+
+             f"{', '+SHORTCUT_EXEC   if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
         self.btn_undo.setText(f"{self.btn_undo.text()} ({SHORTCUT_UNDO})")
-        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_RUN_DESIGN_VIEW}{', '+SHORTCUT_EXEC if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
         self.btn_revert.setText(f"{self.btn_revert.text()} ({SHORTCUT_REVERT})")
         
         # Design View labels/checkbox
@@ -740,7 +749,7 @@ if __name__ == "__main__":
     ui.setupUi(ui)
     ui.load_canvas()
     ui.connect_widget_events()
-    ui.ammend_shortcut_names()
+    ui.amend_shortcut_names()
     ui.resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
     ui.show()
     app.exec_()
