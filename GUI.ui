@@ -522,6 +522,7 @@
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSave_DAT"/>
    </widget>
    <widget class="QMenu" name="menuOverlay">
     <property name="title">
@@ -568,11 +569,6 @@
     <string>Geometry from *.dat file (1 header line)</string>
    </property>
   </action>
-  <action name="actionMSES_dat_File">
-   <property name="text">
-    <string>MSES *.dat File</string>
-   </property>
-  </action>
   <action name="actionPROFOIL">
    <property name="text">
     <string>PROFOIL</string>
@@ -581,6 +577,11 @@
   <action name="actionPROFOIL_UI">
    <property name="text">
     <string>PROFOIL_UI</string>
+   </property>
+  </action>
+  <action name="actionSave_DAT">
+   <property name="text">
+    <string>Save *.dat</string>
    </property>
   </action>
  </widget>

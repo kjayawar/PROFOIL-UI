@@ -70,7 +70,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         """
         maps button/menu/combo_box and tab signals to functions
         """
-        # ================================= STARAT EDITS =================================
+        # ================================= START EDITS ==================================
         # -->  BUTTON ACTION
         self.btn_start_edits.clicked.connect(self.start_cursor_edits)
         # -->  FIRST SHORTCUT
@@ -133,13 +133,18 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         self.open_shortcut.activated.connect(self.menu_file_open)
 
         # ============================= [MENU] FILE -> SAVE ==============================
-        
+        # -->  MENU ACTION
         self.actionSave.triggered.connect(self.menu_file_save_as)
         # --> SHORTCUT BUTTON : New connection for the "File | Save As" button
         self.btn_file_save.clicked.connect(self.menu_file_save_as)
         # --> KEYBOARD SHORTCUT
         self.save_as_shortcut = QShortcut(QKeySequence(SHORTCUT_SAVE_AS), self)
         self.save_as_shortcut.activated.connect(self.menu_file_save_as)
+
+
+        # ============================[MENU] FILE -> SAVE DAT=============================
+        # -->  MENU ACTION
+        self.actionSave_DAT.triggered.connect(self.menu_file_save_dat)
 
         # ========================== [MENU] OVERLAY -> XY FILE ===========================
         # -->  MENU ACTION
@@ -252,10 +257,6 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         # backup zoomed limits of an_ax so that upper-lower surface switching wont be affected
         self.an_ax.figure.canvas.mpl_connect('draw_event', self.bkp_an_ax_zoomed_limits)
 
-        # Amend shortcut names
-        if SHOW_SHORTCUTS_ON_BUTTONS:
-            self.ammend_shortcut_names()
-            
 #============================================= DIALOGS ==============================================
     def message_box_without_beep(self, title, text):
         """ pops a Message box with given title and text, without beep """
@@ -310,6 +311,7 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         filename = filename or QtWidgets.QFileDialog.getOpenFileName(self, 'Open file' ,self.default_open_dir, "Input File (*.in)")[0]
         if filename:
             self.load_in_file(filename)
+            self.current_file_basename = Path(filename).stem
             # Store the path to be used for Save As
             if KEEP_LAST_OPEN_PATH_AS_DEFAULT:
                 self.default_open_dir = str(Path(filename).parent)
@@ -322,6 +324,19 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', self.default_open_dir, "Input File (*.in)")[0]
         if filename:
             self.save_airfoil(filename)
+            self.current_file_basename = Path(filename).stem
+            # Store the path to be used for Save As
+            if KEEP_LAST_OPEN_PATH_AS_DEFAULT:
+                self.default_open_dir = str(Path(filename).parent)
+
+    def menu_file_save_dat(self):
+        """
+        saves resulting airfoil coordinates in XFoil format
+        """
+        if not self.ready_to_interact: return
+        filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save DAT', self.default_open_dir, "Dat File (*.dat)")[0]
+        if filename:
+            self.save_as_dat(self.current_file_basename, filename)
 
     def overlay_file_open(self, skiprows):
         """
@@ -513,6 +528,16 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         with file_path.open("w") as f:
             f.write(Path(WORKDIR/"profoil.in").open().read())
 
+    def save_as_dat(self, header, out_file):
+        """
+        Saves the profoil.xy file from the WORKDIR in to a specified location with a given name in XFoil format.
+        For the ease of use, if the given path does not exist, the program creates the path for you. 
+        """
+        file_path = Path(out_file)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open("w") as f:
+            f.write(f"{header}\n"+Path(WORKDIR/"profoil.xy").open().read())
+
     def on_profoil_in_text_changed(self):
         """
         Indicates there are some unsaved changes in the profoil.in file
@@ -683,16 +708,17 @@ class ProfoilUI(DragDropWindow, Ui_MainWindow, ProfoilCanvas):
         Append menu items and button names with the shortcuts given in the preferences.py
         menu action text has to be fixed length for better visual appeal
         """
+        if SHOW_SHORTCUTS_ON_BUTTONS == "NONE": return
         # Menu Actions
         MENU_TEXT_LENGTH = 24
         self.actionOpen.setText(f"{self.actionOpen.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_OPEN))}({SHORTCUT_OPEN})")
         self.actionSave.setText(f"{self.actionSave.text().ljust(MENU_TEXT_LENGTH-len(SHORTCUT_SAVE_AS))}({SHORTCUT_SAVE_AS})")
 
         # Design View buttons        
-        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_CURSOR_EDIT_DESIGN_VIEW}, {SHORTCUT_EDIT})")
-        self.btn_cancel.setText(f"{self.btn_cancel.text()} ({SHORTCUT_CANCEL_DESIGN_VIEW}, {SHORTCUT_CANCEL})")
+        self.btn_start_edits.setText(f"{self.btn_start_edits.text()} ({SHORTCUT_CURSOR_EDIT_DESIGN_VIEW}{', '+SHORTCUT_EDIT if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
+        self.btn_cancel.setText(f"{self.btn_cancel.text()} ({SHORTCUT_CANCEL_DESIGN_VIEW}{', '+SHORTCUT_CANCEL if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
         self.btn_undo.setText(f"{self.btn_undo.text()} ({SHORTCUT_UNDO})")
-        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_RUN_DESIGN_VIEW}, {SHORTCUT_EXEC})")
+        self.btn_run_profoil.setText(f"{self.btn_run_profoil.text()} ({SHORTCUT_RUN_DESIGN_VIEW}{', '+SHORTCUT_EXEC if SHOW_SHORTCUTS_ON_BUTTONS =='FULL' else ''})")
         self.btn_revert.setText(f"{self.btn_revert.text()} ({SHORTCUT_REVERT})")
         
         # Design View labels/checkbox
@@ -714,6 +740,7 @@ if __name__ == "__main__":
     ui.setupUi(ui)
     ui.load_canvas()
     ui.connect_widget_events()
+    ui.ammend_shortcut_names()
     ui.resize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT)
     ui.show()
     app.exec_()

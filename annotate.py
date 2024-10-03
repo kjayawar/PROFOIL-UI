@@ -87,9 +87,9 @@ IFTP2_dict = {
 #======================================== ITP.. Definitions =========================================
 ITP_1_val_dict ={
 	1 : "Phi of segment {}",
-	4 : "Vi (iteration on velocity level allowed only once) for segment {}",
-	5 : "Vi_tilde for segment {}",
-	6 : "Alpha* for segment {}",
+	4 : "Vi (iteration on velocity level allowed only once) of segment {}",
+	5 : "Vi_tilde of segment {}",
+	6 : "Alpha* of segment {}",
 }
 
 ITP_2_val_dict = {
@@ -103,12 +103,12 @@ ITP_2_val_dict = {
 	1:{
 	100 : "upper-surface Phi-values, except Phi_ILE",
 	200 : "lower-surface Phi-values, except Phi_ILE",
-	300 : "upper-surface and lower-surface Phi-values in OPPOSITE directions, excluding Phi_ILE",
-	400 : "upper-surface and lower-surface Phi-values in the SAME direction, excluding Phi_ILE",	
+	300 : "upper-surface and lower-surface Phi-values in OPPOSITE directions (excluding Phi_ILE)",
+	400 : "upper-surface and lower-surface Phi-values in the SAME direction (excluding Phi_ILE)",	
 	500 : "upper-surface Phi-values, including Phi_ILE",
 	600 : "lower-surface Phi-values, including Phi_ILE",
-	700 : "upper-surface and lower-surface Phi-values in OPPOSITE directions, including Phi_ILE",
-	800 : "upper-surface and lower-surface Phi-values in the SAME direction, including Phi_ILE",
+	700 : "upper-surface and lower-surface Phi-values in OPPOSITE directions (including Phi_ILE)",
+	800 : "upper-surface and lower-surface Phi-values in the SAME direction (including Phi_ILE)",
 	1000 : "group 1 Phi-values",
 	1100 : "group 2 Phi-values",
 	1200 : "group 3 Phi-values",
@@ -131,10 +131,10 @@ ITP_2_val_dict = {
 	200 : "lower-surface alpha* values",
 	300 : "upper-surface alpha* values and lower-surface alpha* values in OPPOSITE directions",
 	400 : "upper-surface alpha* values and lower-surface alpha* values in the SAME direction",
-	500 : "upper-surface alpha* values (except not recovery alpha*)",
-	600 : "lower-surface alpha* values (except not recovery alpha*)",
-	700 : "upper-surface alpha* values and lower-surface alpha* values in OPPOSITE directions (except not recovery alpha*s)",
-	800 : "upper-surface alpha* values and lower-surface alpha* values in the SAME direction (except not recovery alpha*s)",
+	500 : "upper-surface alpha* values (excluding the recovery alpha*)",
+	600 : "lower-surface alpha* values (excluding the recovery alpha*)",
+	700 : "upper-surface alpha* values and lower-surface alpha* values in OPPOSITE directions (excluding the recovery alpha*s)",
+	800 : "upper-surface alpha* values and lower-surface alpha* values in the SAME direction (excluding the recovery alpha*s)",
 	1000 : "group 1 alpha*-values",
 	1100 : "group 2 alpha*-values",
 	1200 : "group 3 alpha*-values",
@@ -142,8 +142,8 @@ ITP_2_val_dict = {
 	7:{
 	100 : "upper-surface K",
 	200 : "lower-surface K",
-	300 : "upper-surface K and Lower-surface K in OPPOSITE directions",
-	400 : "upper-surface K and Lower-surface K in the SAME direction",
+	300 : "upper-surface K and lower-surface K in OPPOSITE directions",
+	400 : "upper-surface K and lower-surface K in the SAME direction",
 	}
 }
 
@@ -154,8 +154,8 @@ LLBOS_dict = {
 }
 
 LLBE_dict = {
-	1: "in the BOS-->EOS direction (Lower Surface)",
-	0: "in the EOS-->BOS direction (Upper Surface)"
+	1: "in the BOS-->EOS direction (lower Surface)",
+	0: "in the EOS-->BOS direction (upper Surface)"
 }
 
 # ======================================= NEWT1.. Descriptions =======================================

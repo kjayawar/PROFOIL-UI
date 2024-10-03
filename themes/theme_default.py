@@ -146,6 +146,9 @@ COMMENT_MARKER                  = "#"               # PROFOIL supports # or ! as
 COMMENT_COLOR                   = "green"           # Choose comment color
 
 #========================================== MISCELLANEOUS ===========================================
-SHOW_SHORTCUTS_ON_BUTTONS       = True              # Buttons show shortcuts when set - ex "Save (Ctrl+S)"
-KEEP_LAST_OPEN_PATH_AS_DEFAULT  = True              # Set to True to use the last open path for Save As; 
+SHOW_SHORTCUTS_ON_BUTTONS       = "FULL"            # Buttons show shortcuts strings - 3 possible options
+                                                    #   "NONE" -- No shortcuts strings shown on the buttons
+                                                    #   "FULL" -- All shortcuts are shown - ex Cancel (C, Ctrl+C)
+                                                    #   "HALF" -- only one shortcut is shown - ex Cancel (C)
+KEEP_LAST_OPEN_PATH_AS_DEFAULT  = True              # Set to True to keep the last open/Save As path as default; 
                                                     # False to use ~/runs as the default folder
