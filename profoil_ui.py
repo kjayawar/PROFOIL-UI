@@ -31,7 +31,7 @@ from matplotlib.backend_bases import key_press_handler
 
 from GUIMainWindow import Ui_MainWindow
 from profoil_canvas import ProfoilCanvas
-from syntax_highligher import CommentHighlighter
+from syntax_highlighter import CommentHighlighter
 from dragndrop import DragDropWindow
 from preferences import *
 from annotate import annotate_text
